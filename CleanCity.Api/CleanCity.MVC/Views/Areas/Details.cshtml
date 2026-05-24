@@ -1,0 +1,76 @@
+﻿@model CleanCity.Domain.Entities.Area
+@using System
+
+@{
+    ViewData["Title"] = "تفاصيل المنطقة";
+
+    // عدد البلاغات خلال 24 ساعة (إذا Reports محمّلة)
+    var last24h = DateTime.UtcNow.AddHours(-24);
+    var reports24h = Model.Reports?.Count(r => r.CreatedAt >= last24h) ?? 0;
+
+    // تصنيف خطورة بسيط حسب عدد البلاغات (عدّل الحدود كما تريد)
+    string riskText;
+    string riskBadge;
+
+    if (reports24h >= 30) { riskText = "مرتفع"; riskBadge = "badge badge--warn"; }
+    else if (reports24h >= 10) { riskText = "متوسط"; riskBadge = "badge badge--info"; }
+    else { riskText = "منخفض"; riskBadge = "badge badge--success"; }
+}
+
+<header class="topbar">
+    <button class="icon-btn topbar__menu" id="btnMobileMenu" type="button" aria-label="فتح القائمة">
+        <span class="icon" aria-hidden="true">≡</span>
+    </button>
+
+    <div class="topbar__title">
+        <h1 class="page-title">تفاصيل المنطقة</h1>
+        <p class="page-subtitle">عرض تفاصيل منطقة</p>
+    </div>
+
+    <div class="topbar__actions">
+        <a class="btn btn--primary"
+           asp-controller="Areas"
+           asp-action="Details"
+           asp-route-id="@Model.Id"
+           aria-label="تحديث الصفحة">تحديث</a>
+    </div>
+</header>
+
+<section class="content" aria-live="polite">
+    <section class="panel">
+        <div class="panel__header">
+            <h2 class="panel__title">تفاصيل المنطقة</h2>
+            <div class="panel__meta">ID: @Model.Id</div>
+        </div>
+
+        <div style="padding:14px">
+            <div class="kv">
+                <div class="kv__k">اسم المنطقة</div>
+                <div class="kv__v">@Model.Name</div>
+
+                <div class="kv__k">حدود المنطقة</div>
+                <div class="kv__v">
+                    MinLat: @Model.MinLat — MaxLat: @Model.MaxLat<br />
+                    MinLng: @Model.MinLng — MaxLng: @Model.MaxLng
+                </div>
+
+                <div class="kv__k">عدد البلاغات (24 ساعة)</div>
+                <div class="kv__v">@reports24h</div>
+
+                <div class="kv__k">مستوى الخطورة</div>
+                <div class="kv__v"><span class="@riskBadge">@riskText</span></div>
+            </div>
+
+            <div class="panel__footer" style="padding:12px 0 0;border-top:0">
+                <a class="btn"
+                   asp-controller="Areas"
+                   asp-action="Index">رجوع للمناطق</a>
+
+                <a class="btn btn--primary"
+                   asp-controller="Areas"
+                   asp-action="Edit"
+                   asp-route-id="@Model.Id">تعديل المنطقة</a>
+            </div>
+        </div>
+    </section>
+</section>

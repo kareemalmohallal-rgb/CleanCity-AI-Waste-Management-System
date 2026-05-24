@@ -1,0 +1,79 @@
+﻿@model CleanCity.Domain.Entities.AwarenessContent
+
+<header class="topbar">
+    <button class="icon-btn topbar__menu" id="btnMobileMenu" type="button" aria-label="فتح القائمة">
+        <span class="icon" aria-hidden="true">≡</span>
+    </button>
+    <div class="topbar__title">
+        <h1 class="page-title">حذف مقال</h1>
+        <p class="page-subtitle">تأكيد الحذف</p>
+    </div>
+    <div class="topbar__actions">
+        <a class="btn" asp-controller="AwarenessContents" asp-action="Index">رجوع</a>
+    </div>
+</header>
+
+<section class="content" aria-live="polite">
+    <section class="panel">
+        <div class="panel__header">
+            <h2 class="panel__title">تأكيد حذف المقال</h2>
+            <div class="panel__meta">ART-@Model.Id.ToString("D2")</div>
+        </div>
+
+        @if (!ViewData.ModelState.IsValid)
+        {
+            <div style="margin:16px; padding:12px 16px; background:rgba(220,53,69,.12);
+                            border:1px solid rgba(220,53,69,.4); border-radius:8px; color:#dc3545;">
+                @Html.ValidationSummary(false, "", new { @class = "text-danger",
+                style = "margin:0; padding:0; list-style:none;" })
+        </div>
+                }
+
+        <div style="padding:16px">
+
+            <!-- صورة المقال -->
+            @if (!string.IsNullOrEmpty(Model.ImageUrl))
+            {
+                <div style="text-align:center; margin-bottom:16px;">
+                    <img src="@Model.ImageUrl"
+                         alt="صورة المقال"
+                         style="max-width:100%;
+                                    max-height:200px;
+                                    border-radius:10px;
+                                    opacity:.7;
+                                    border:2px solid rgba(220,53,69,.3);" />
+                </div>
+            }
+
+            <div class="kv">
+                <div class="kv__k">العنوان</div>
+                <div class="kv__v">@Model.Title</div>
+
+                <div class="kv__k">تاريخ النشر</div>
+                <div class="kv__v">@Model.CreatedAt.ToString("yyyy-MM-dd HH:mm")</div>
+
+                <div class="kv__k">الصورة</div>
+                <div class="kv__v">
+                    @(string.IsNullOrEmpty(Model.ImageUrl) ? "لا توجد" : "مرفقة — ستُحذف أيضاً")
+                </div>
+
+                <div class="kv__k">المحتوى</div>
+                <div class="kv__v" style="white-space:pre-wrap; line-height:1.8;
+                                          max-height:200px; overflow-y:auto">
+                    @Model.Content
+                </div>
+            </div>
+
+            <div class="panel__footer" style="padding:14px 0 0; border-top:0; display:flex; gap:10px;">
+                <form asp-controller="AwarenessContents"
+                      asp-action="Delete"
+                      asp-route-id="@Model.Id"
+                      method="post">
+                    @Html.AntiForgeryToken()
+                    <button class="btn btn--danger" type="submit">تأكيد الحذف</button>
+                </form>
+                <a class="btn" asp-controller="AwarenessContents" asp-action="Index">إلغاء</a>
+            </div>
+        </div>
+    </section>
+</section>

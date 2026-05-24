@@ -1,0 +1,161 @@
+﻿@model CleanCity.MVC.Models.DashboardVm
+@{
+    ViewData["Title"] = "Dashboard";
+}
+
+<header class="topbar">
+    <button class="icon-btn topbar__menu" id="btnMobileMenu" type="button" aria-label="فتح القائمة">
+        <span class="icon" aria-hidden="true">≡</span>
+    </button>
+
+    <div class="topbar__title">
+        <h1 class="page-title">لوحة التحكم</h1>
+        <p class="page-subtitle">بيانات مباشرة من قاعدة البيانات</p>
+    </div>
+
+    <div class="topbar__actions">
+        <a class="btn btn--primary" asp-controller="Home" asp-action="Index" aria-label="تحديث الصفحة">تحديث</a>
+    </div>
+</header>
+
+<section class="content" aria-live="polite">
+
+    <section class="grid grid--cards" aria-label="مؤشرات سريعة">
+        <article class="card stat-card">
+            <div class="card__header">
+                <h2 class="card__title">البلاغات اليوم</h2>
+                <span class="badge badge--info">Today</span>
+            </div>
+            <div class="card__value">@Model.ReportsToday</div>
+            <div class="card__hint">من 00:00 UTC</div>
+        </article>
+
+        <article class="card stat-card">
+            <div class="card__header">
+                <h2 class="card__title">عالقة</h2>
+                <span class="badge badge--warn">تحتاج متابعة</span>
+            </div>
+            <div class="card__value">@Model.PendingReports</div>
+            <div class="card__hint">غير مكتملة/غير مرفوضة</div>
+        </article>
+
+        <article class="card stat-card">
+            <div class="card__header">
+                <h2 class="card__title">تم التنفيذ</h2>
+                <span class="badge badge--success">آخر 24 ساعة</span>
+            </div>
+            <div class="card__value">@Model.CompletedLast24h</div>
+            <div class="card__hint">آخر 24 ساعة</div>
+        </article>
+
+        <article class="card stat-card">
+            <div class="card__header">
+                <h2 class="card__title">متوسط زمن الاستجابة</h2>
+                <span class="badge badge--neutral">SLA</span>
+            </div>
+            <div class="card__value">
+                <span>@Model.AvgResponseMinutes</span>
+                <span class="unit">دقيقة</span>
+            </div>
+            <div class="card__hint">من الاستلام حتى الإسناد</div>
+        </article>
+    </section>
+
+    @* <section class="panel" aria-label="مرشحات">
+        <div class="panel__header">
+            <h2 class="panel__title">مرشحات العرض</h2>
+        </div>
+
+        <div class="filters">
+            <label class="field">
+                <span class="field__label">المنطقة</span>
+                <select class="field__control">
+                    <option value="all">الكل</option>
+                    @foreach (var a in Model.Areas)
+                    {
+                        <option value="@a.Id">@a.Name</option>
+                    }
+                </select>
+            </label>
+
+            <label class="field">
+                <span class="field__label">بحث</span>
+                <input class="field__control" type="search" placeholder="رقم البلاغ / وصف / سائق ..." autocomplete="off" />
+            </label>
+        </div>
+    </section> *@
+
+    <section class="grid grid--2">
+
+        <section class="panel" aria-label="أحدث البلاغات">
+            <div class="panel__header">
+                <h2 class="panel__title">أحدث البلاغات</h2>
+                <div class="panel__meta">@Model.LatestReports.Count سجلات</div>
+            </div>
+
+            <div class="table-wrap" role="region" aria-label="جدول البلاغات" tabindex="0">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>رقم</th>
+                            <th>المنطقة</th>
+                            <th>الحالة</th>
+                            <th>السائق</th>
+                            <th>الوقت</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (Model.LatestReports.Any())
+                        {
+                            foreach (var r in Model.LatestReports)
+                            {
+                                <tr>
+                                    <td>#@r.Id</td>
+                                    <td>@r.AreaName</td>
+                                    <td><span class="@r.StatusBadgeClass">@r.StatusText</span></td>
+                                    <td>@r.DriverName</td>
+                                    <td>@r.CreatedAt.ToString("HH:mm")</td>
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr><td colspan="5" style="text-align:center;opacity:.8">لا توجد بلاغات.</td></tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <section class="panel" aria-label="أكثر المناطق بلاغاً">
+            <div class="panel__header">
+                <h2 class="panel__title">أكثر المناطق بلاغاً</h2>
+                <div class="panel__meta">آخر 24 ساعة</div>
+            </div>
+
+            <div class="hotspots" aria-live="polite">
+                @if (Model.Hotspots.Any())
+                {
+                    foreach (var h in Model.Hotspots)
+                    {
+                        <div class="hotspot">
+                            <div class="hotspot__name">@h.AreaName</div>
+                            <div class="hotspot__bar"><span style="width:@h.Percent%"></span></div>
+                            <div class="hotspot__count">@h.Count</div>
+                        </div>
+                    }
+                }
+                else
+                {
+                    <div style="opacity:.8">لا توجد بيانات.</div>
+                }
+            </div>
+
+            <div class="panel__footer">
+                <a class="btn" asp-controller="Areas" asp-action="Index">عرض المناطق</a>
+                <a class="btn btn--primary" asp-controller="Reports" asp-action="Index">فتح التقارير</a>
+            </div>
+        </section>
+
+    </section>
+</section>

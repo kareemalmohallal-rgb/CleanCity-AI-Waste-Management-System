@@ -1,0 +1,58 @@
+﻿@model CleanCity.MVC.Models.EditDriverUserVm
+
+<header class="topbar">
+    <button class="icon-btn topbar__menu" id="btnMobileMenu" type="button" aria-label="فتح القائمة">
+        <span class="icon" aria-hidden="true">≡</span>
+    </button>
+    <div class="topbar__title">
+        <h1 class="page-title">تعديل مستخدم</h1>
+        <p class="page-subtitle">@Model.FullName</p>
+    </div>
+    <div class="topbar__actions">
+        <a class="btn" asp-controller="AdminUsers" asp-action="Index">رجوع</a>
+    </div>
+</header>
+
+<section class="content" aria-live="polite">
+    <section class="panel">
+        <div class="panel__header">
+            <h2 class="panel__title">تعديل بيانات الحساب</h2>
+            <div class="panel__meta">@Model.FullName</div>
+        </div>
+
+        <form style="padding:14px"
+              asp-controller="AdminUsers"
+              asp-action="Edit"
+              asp-route-id="@Model.UserId"
+              method="post">
+            @Html.AntiForgeryToken()
+            <input type="hidden" asp-for="UserId" />
+            <input type="hidden" asp-for="FullName" />
+
+            <div class="filters" style="grid-template-columns:1fr 1fr; align-items:start">
+
+                <label class="field">
+                    <span class="field__label">اسم المستخدم</span>
+                    <input class="field__control" asp-for="UserName" type="text" />
+                    <span asp-validation-for="UserName" class="text-danger"></span>
+                </label>
+
+                <label class="field">
+                    <span class="field__label">كلمة مرور جديدة (اتركها فارغة إذا لا تريد التغيير)</span>
+                    <input class="field__control" asp-for="NewPassword" type="password" placeholder="••••••••" autocomplete="new-password" />
+                    <span asp-validation-for="NewPassword" class="text-danger"></span>
+                </label>
+
+                <div class="filters__actions" style="align-self:end">
+                    <a class="btn" asp-controller="AdminUsers" asp-action="Index">إلغاء</a>
+                    <button class="btn btn--primary" type="submit">حفظ التعديل</button>
+                </div>
+
+            </div>
+
+            <div style="margin-top:10px">
+                @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+            </div>
+        </form>
+    </section>
+</section>

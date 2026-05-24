@@ -1,0 +1,150 @@
+﻿@model CleanCity.MVC.Models.ReportDetailsVm
+@{
+    ViewData["Title"] = $"تفاصيل البلاغ {Model.ReportId}";
+
+    // تحديد CSS badge بناءً على الحالة
+    var badgeClass = Model.Status switch
+    {
+        "Completed" => "badge badge--success",
+        "InProgress" => "badge badge--info",
+        "UnderReview" => "badge badge--warn",
+        "Rejected" => "badge badge--neutral",
+        _ => "badge badge--neutral"
+    };
+
+    var statusAr = Model.Status switch
+    {
+        "Received" => "مستلم",
+        "InProgress" => "قيد التنفيذ",
+        "UnderReview" => "تحت المراجعة",
+        "Completed" => "مكتمل",
+        "Rejected" => "مرفوض",
+        _ => Model.Status
+    };
+}
+
+<!-- ── Top Bar ──────────────────────────────────────────────────────────── -->
+<header class="topbar">
+    <div class="topbar__title">
+        <h1 class="page-title">تفاصيل البلاغ</h1>
+        <p class="page-subtitle">@Model.ReportId</p>
+    </div>
+    <div class="topbar__actions">
+        <a class="btn" asp-controller="Reports" asp-action="Index">← رجوع للقائمة</a>
+
+        @{
+            bool aiRejected = !string.IsNullOrWhiteSpace(Model.AiReason);
+            bool driverRejected = Model.RejectedByDriverName is not null;
+            bool showReassign = !aiRejected &&
+            (Model.Status is "Received" || (Model.Status is "Rejected" && driverRejected));
+        }
+        @if (showReassign)
+        {
+            <a class="btn btn--primary"
+               asp-controller="Reports"
+               asp-action="Reassign"
+               asp-route-id="@Model.ReportId">
+                إسناد لسائق
+            </a>
+        }
+    </div>
+</header>
+
+<section class="content">
+
+    <div class="grid grid--2">
+
+        <!-- ── بيانات البلاغ ──────────────────────────────────────────── -->
+        <section class="panel" aria-label="بيانات البلاغ">
+            <div class="panel__header">
+                <h2 class="panel__title">بيانات البلاغ</h2>
+                <span class="@badgeClass">@statusAr</span>
+            </div>
+
+            <dl class="kv" style="padding:14px">
+                <dt class="kv__k">رقم البلاغ</dt>
+                <dd class="kv__v">@Model.ReportId</dd>
+
+                <dt class="kv__k">المنطقة</dt>
+                <dd class="kv__v">@Model.AreaName</dd>
+
+                <dt class="kv__k">الوصف</dt>
+                <dd class="kv__v">@(string.IsNullOrWhiteSpace(Model.Description) ? "—" : Model.Description)</dd>
+
+                <dt class="kv__k">السائق الحالي</dt>
+                <dd class="kv__v">@(Model.CurrentDriverName ?? "—")</dd>
+
+                <dt class="kv__k">تاريخ الإنشاء</dt>
+                <dd class="kv__v">@Model.CreatedAt.ToString("yyyy-MM-dd HH:mm")</dd>
+            </dl>
+
+            <!-- صورة البلاغ -->
+            @if (!string.IsNullOrWhiteSpace(Model.ImageUrl))
+            {
+                <div style="padding:0 14px 14px">
+                    <p class="kv__k" style="margin-bottom:6px">صورة البلاغ</p>
+                    <img src="@Model.ImageUrl"
+                         alt="صورة البلاغ @Model.ReportId"
+                         style="max-width:100%;max-height:320px;border-radius:8px;border:1px solid rgba(0,0,0,.12);object-fit:contain" />
+                </div>
+            }
+        </section>
+
+        <!-- ── تحليل الذكاء الاصطناعي + آخر رفض ─────────────────────── -->
+        <div style="display:flex;flex-direction:column;gap:16px">
+
+            <!-- AI -->
+            <section class="panel" aria-label="نتيجة تحليل AI">
+                <div class="panel__header">
+                    <h2 class="panel__title">نتيجة تحليل الذكاء الاصطناعي</h2>
+                </div>
+                <dl class="kv" style="padding:14px">
+                    <dt class="kv__k">سبب الرفض من AI</dt>
+                    <dd class="kv__v">
+                        @if (string.IsNullOrWhiteSpace(Model.AiReason))
+                        {
+                            <span style="opacity:.6">لا يوجد رفض من AI</span>
+                        }
+                        else
+                        {
+                            @Model.AiReason
+                        }
+                    </dd>
+                </dl>
+            </section>
+
+            <!-- آخر رفض من سائق -->
+            @if ((Model.RejectedByDriverName is not null || Model.RejectionReason is not null) &&
+                        string.IsNullOrWhiteSpace(Model.AiReason))
+            {
+                <section class="panel" aria-label="آخر رفض من سائق">
+                    <div class="panel__header">
+                        <h2 class="panel__title">آخر رفض من سائق</h2>
+                        <span class="badge badge--neutral">مرفوض</span>
+                    </div>
+                    <dl class="kv" style="padding:14px">
+                        <dt class="kv__k">السائق</dt>
+                        <dd class="kv__v">@(Model.RejectedByDriverName ?? "—")</dd>
+
+                        <dt class="kv__k">سبب الرفض</dt>
+                        <dd class="kv__v">@(Model.RejectionReason ?? "—")</dd>
+
+                        <dt class="kv__k">وقت الرفض</dt>
+                        <dd class="kv__v">@(Model.RejectedAt?.ToString("yyyy-MM-dd HH:mm") ?? "—")</dd>
+                    </dl>
+
+                    <div class="panel__footer">
+                        <a class="btn btn--primary"
+                           asp-controller="Reports"
+                           asp-action="Reassign"
+                           asp-route-id="@Model.ReportId">
+                            إسناد لسائق آخر
+                        </a>
+                    </div>
+                </section>
+            }
+
+        </div>
+    </div>
+
+</section>

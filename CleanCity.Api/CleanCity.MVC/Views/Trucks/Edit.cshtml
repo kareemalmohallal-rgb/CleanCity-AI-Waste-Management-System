@@ -1,0 +1,98 @@
+﻿@model CleanCity.Domain.Entities.Truck
+@{
+    ViewData["Title"] = "تعديل شاحنة";
+}
+
+<header class="topbar">
+    <button class="icon-btn topbar__menu" id="btnMobileMenu" type="button" aria-label="فتح القائمة">
+        <span class="icon" aria-hidden="true">≡</span>
+    </button>
+
+    <div class="topbar__title">
+        <h1 class="page-title">تعديل شاحنة</h1>
+        <p class="page-subtitle">تحديث بيانات الشاحنة</p>
+    </div>
+
+    <div class="topbar__actions">
+        <a class="btn btn--primary" asp-controller="Trucks" asp-action="Index">رجوع</a>
+    </div>
+</header>
+
+<section class="content" aria-live="polite">
+    <section class="panel">
+        <div class="panel__header">
+            <h2 class="panel__title">بيانات الشاحنة</h2>
+            <div class="panel__meta">TRK-@Model.Id.ToString("D2")</div>
+        </div>
+
+        <form style="padding:14px"
+              asp-controller="Trucks"
+              asp-action="Edit"
+              asp-route-id="@Model.Id"
+              method="post">
+            @Html.AntiForgeryToken()
+            <input type="hidden" asp-for="Id" />
+
+            <div class="filters" style="grid-template-columns:1fr 1fr; align-items:start">
+
+                <!-- Name -->
+                <label class="field">
+                    <span class="field__label">الاسم</span>
+                    <input class="field__control" asp-for="Name" type="text" placeholder="مثال: شاحنة النظافة 1" />
+                    <span asp-validation-for="Name" class="text-danger"></span>
+                </label>
+
+                <!-- Number -->
+                <label class="field">
+                    <span class="field__label">الرقم</span>
+                    <input class="field__control" asp-for="Number" type="text" placeholder="مثال: TRK-01 أو 12345" />
+                    <span asp-validation-for="Number" class="text-danger"></span>
+                </label>
+
+                <!-- Size -->
+                <label class="field">
+                    <span class="field__label">الحجم</span>
+                    <input class="field__control" asp-for="Size" type="text" placeholder="مثال: 10 طن / 6m³" />
+                    <span asp-validation-for="Size" class="text-danger"></span>
+                </label>
+
+                <!-- IsActive -->
+                <label class="field">
+                    <span class="field__label">الحالة</span>
+                    <select class="field__control" asp-for="IsActive">
+                        <option value="true">متاحة</option>
+                        <option value="false">غير متاحة</option>
+                    </select>
+                    <span asp-validation-for="IsActive" class="text-danger"></span>
+                </label>
+
+                <!-- TruckTypeId -->
+                <label class="field">
+                    <span class="field__label">نوع الشاحنة</span>
+                    <select class="field__control" asp-for="TruckTypeId" asp-items="ViewBag.TruckTypes">
+                        <option value="">اختر النوع</option>
+                    </select>
+                    <span asp-validation-for="TruckTypeId" class="text-danger"></span>
+                </label>
+
+                <!-- DriverId -->
+                <label class="field">
+                    <span class="field__label">السائق</span>
+                    <select class="field__control" asp-for="DriverId" asp-items="ViewBag.Drivers">
+                        <option value="">اختر السائق</option>
+                    </select>
+                    <span asp-validation-for="DriverId" class="text-danger"></span>
+                </label>
+
+                <div class="filters__actions" style="align-self:end">
+                    <a class="btn" asp-controller="Trucks" asp-action="Index">إلغاء</a>
+                    <button class="btn btn--primary" type="submit">حفظ التعديل</button>
+                </div>
+            </div>
+
+            <div style="margin-top:10px">
+                @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+            </div>
+        </form>
+    </section>
+</section>

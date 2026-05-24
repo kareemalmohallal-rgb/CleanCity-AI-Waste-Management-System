@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "31533410717",
+    "project_id": "clean-city-ye-2026-acdff",
+    "storage_bucket": "clean-city-ye-2026-acdff.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:31533410717:android:ce70782c6ad52d2cb9a774",
+        "android_client_info": {
+          "package_name": "com.example.cleancityapp"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAw1K7HuniFCh0B_TlT_4rzOYWiQqAevzY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

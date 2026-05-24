@@ -1,0 +1,54 @@
+﻿@model CleanCity.MVC.Models.DriverUserVm
+
+<header class="topbar">
+    <button class="icon-btn topbar__menu" id="btnMobileMenu" type="button" aria-label="فتح القائمة">
+        <span class="icon" aria-hidden="true">≡</span>
+    </button>
+    <div class="topbar__title">
+        <h1 class="page-title">حذف مستخدم</h1>
+        <p class="page-subtitle">تأكيد الحذف</p>
+    </div>
+    <div class="topbar__actions">
+        <a class="btn" asp-controller="AdminUsers" asp-action="Index">رجوع</a>
+    </div>
+</header>
+
+<section class="content" aria-live="polite">
+    <section class="panel">
+        <div class="panel__header">
+            <h2 class="panel__title">تأكيد حذف المستخدم</h2>
+            <div class="panel__meta">@Model.FullName</div>
+        </div>
+
+        @if (!ViewData.ModelState.IsValid)
+        {
+            <div style="margin:16px; padding:12px 16px; background:rgba(220,53,69,.12); border:1px solid rgba(220,53,69,.4); border-radius:8px; color:#dc3545;">
+                @Html.ValidationSummary(false, "", new { @class = "text-danger", style = "margin:0; padding:0; list-style:none;" })
+            </div>
+        }
+
+        <div style="padding:16px">
+            <div class="kv">
+                <div class="kv__k">السائق</div>
+                <div class="kv__v">@Model.FullName</div>
+
+                <div class="kv__k">اسم المستخدم</div>
+                <div class="kv__v">@Model.UserName</div>
+
+                <div class="kv__k">رقم الهاتف</div>
+                <div class="kv__v">@Model.PhoneNumber</div>
+            </div>
+
+            <div class="panel__footer" style="padding:14px 0 0; border-top:0; display:flex; gap:10px;">
+                <form asp-controller="AdminUsers"
+                      asp-action="Delete"
+                      asp-route-id="@Model.UserId"
+                      method="post">
+                    @Html.AntiForgeryToken()
+                    <button class="btn btn--danger" type="submit">تأكيد الحذف</button>
+                </form>
+                <a class="btn" asp-controller="AdminUsers" asp-action="Index">إلغاء</a>
+            </div>
+        </div>
+    </section>
+</section>

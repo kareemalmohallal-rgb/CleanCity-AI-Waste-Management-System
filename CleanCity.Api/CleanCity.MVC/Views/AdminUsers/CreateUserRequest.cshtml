@@ -1,0 +1,104 @@
+﻿@model CleanCity.MVC.Models.CreateUserViewModel
+
+
+<header class="topbar">
+    <button class="icon-btn topbar__menu" id="btnMobileMenu" type="button" aria-label="فتح القائمة">
+        <span class="icon" aria-hidden="true">≡</span>
+    </button>
+
+    <div class="topbar__title">
+        <h1 class="page-title">إضافة مستخدم</h1>
+        <p class="page-subtitle">ربط مستخدم بسائق + بيانات الدخول</p>
+    </div>
+
+    <div class="topbar__actions">
+        <div class="pill">
+            <span class="pill__label">الوقت:</span>
+            <span class="pill__value">—</span>
+        </div>
+
+        <a class="btn btn--primary" href="" aria-label="تحديث الصفحة">تحديث</a>
+    </div>
+</header>
+
+<section class="content" aria-live="polite">
+    <section class="panel">
+        <div class="panel__header">
+            <h2 class="panel__title">إنشاء مستخدم</h2>
+            <div class="panel__meta">نموذج إدخال</div>
+        </div>
+
+        <form style="padding:14px"
+              asp-controller="AdminUsers"
+              asp-action="CreateUserRequest"
+              method="post">
+            @Html.AntiForgeryToken()
+
+            <div class="filters" style="grid-template-columns:1fr 1fr; align-items:start">
+
+                <!-- تحديد السائق -->
+                <label class="field">
+                    <span class="field__label">السائق</span>
+                    <select class="field__control"
+                            asp-for="DriverId"
+                            asp-items="ViewBag.Drivers"
+                            >
+                        <option value="">اختر السائق</option>
+                    </select>
+                    <span asp-validation-for="DriverId" class="text-danger"></span>
+                </label>
+
+                <!-- اسم المستخدم -->
+                <label class="field">
+                    <span class="field__label">اسم المستخدم</span>
+                    <input class="field__control"
+                           asp-for="UserName"
+                           type="text"
+                           placeholder="مثال: driver_ahmed"
+                           autocomplete="username"
+                           required />
+                    <span asp-validation-for="UserName" class="text-danger"></span>
+                </label>
+
+                <!-- كلمة السر -->
+                <label class="field">
+                    <span class="field__label">كلمة السر</span>
+                    <input class="field__control"
+                           asp-for="Password"
+                           type="password"
+                           placeholder="أدخل كلمة السر"
+                           autocomplete="new-password"
+                           required />
+                    <span asp-validation-for="Password" class="text-danger"></span>
+                </label>
+
+                <!-- تأكيد كلمة السر (اختياري لكن أفضل) -->
+                <label class="field">
+                    <span class="field__label">تأكيد كلمة السر</span>
+                    <input class="field__control"
+                           asp-for="ConfirmPassword"
+                           type="password"
+                           placeholder="أعد إدخال كلمة السر"
+                           autocomplete="new-password"
+                           required />
+                    <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
+                </label>
+
+                <!-- أزرار الإجراءات -->
+                <div class="filters__actions" style="align-self:end">
+                    <a class="btn" asp-controller="AdminUsers" asp-action="CreateUserRequest">مسح</a>
+                    <button class="btn btn--primary" type="submit">حفظ</button>
+                </div>
+
+            </div>
+
+            <div style="margin-top:10px">
+                @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+            </div>
+        </form>
+    </section>
+</section>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

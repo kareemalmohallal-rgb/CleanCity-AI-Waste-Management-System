@@ -1,0 +1,211 @@
+﻿@* @model IEnumerable<CleanCity.Domain.Entities.Truck>
+
+
+    <header class="topbar">
+        <button class="icon-btn topbar__menu" id="btnMobileMenu" type="button" aria-label="فتح القائمة">
+            <span class="icon" aria-hidden="true">≡</span>
+        </button>
+
+        <div class="topbar__title">
+            <h1 class="page-title">الشاحنات</h1>
+            <p class="page-subtitle">إدارة الشاحنات</p>
+        </div>
+
+        <div class="topbar__actions">
+
+            <a class="btn btn--primary" asp-controller="Trucks" asp-action="Index" aria-label="تحديث الصفحة">تحديث</a>
+        </div>
+    </header>
+
+    <section class="content" aria-live="polite">
+        <section class="panel">
+            <div class="panel__header">
+                <h2 class="panel__title">الشاحنات</h2>
+                <div class="panel__meta">@((Model?.Count() ?? 0)) سجلات</div>
+            </div>
+
+            <div class="table-wrap">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>الكود</th>
+                            <th>السائق</th>
+                            <th>الحالة</th>
+                            <th>المناطق المسندة</th>
+                            <th>إجراءات</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        @if (Model != null && Model.Any())
+                        {
+                            foreach (var t in Model)
+                            {
+                                <tr>
+                                    <!-- كود شكلي -->
+                                    <td>TRK-@t.Id.ToString("D2")</td>
+
+                                    <!-- اسم السائق (إن كانت Navigation موجودة) -->
+                                    <td>@(t.Driver?.FullName ?? "—")</td>
+
+                                    <!-- الحالة (افتراض IsActive bool) -->
+                                    <td>
+                                        @if (t.IsActive)
+                                        {
+                                            <span class="badge badge--success">متاحة</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge badge--warn">غير متاحة</span>
+                                        }
+                                    </td>
+
+                                    <td>
+                                        <div class="row-actions">
+                                            <a class="btn btn--sm"
+                                               asp-controller="Trucks"
+                                               asp-action="Details"
+                                               asp-route-id="@t.Id">تفاصيل</a>
+
+                                            <a class="btn btn--sm btn--primary"
+                                               asp-controller="Trucks"
+                                               asp-action="Edit"
+                                               asp-route-id="@t.Id">تعديل</a>
+
+                                            <form asp-controller="Trucks"
+                                                  asp-action="Delete"
+                                                  asp-route-id="@t.Id"
+                                                  method="post"
+                                                  style="display:inline">
+                                                @Html.AntiForgeryToken()
+                                                <button class="btn btn--sm btn--danger" type="submit">حذف</button>
+                                            </form>
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr>
+                                <td colspan="5" style="text-align:center; opacity:.8;">لا توجد شاحنات.</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="panel__footer">
+                <a class="btn btn--primary" asp-controller="Trucks" asp-action="Create">إضافة شاحنة</a>
+             </div>
+        </section>
+    </section> *@
+@model IEnumerable<CleanCity.Domain.Entities.Truck>
+
+
+<header class="topbar">
+    <button class="icon-btn topbar__menu" id="btnMobileMenu" type="button" aria-label="فتح القائمة">
+        <span class="icon" aria-hidden="true">≡</span>
+    </button>
+
+    <div class="topbar__title">
+        <h1 class="page-title">الشاحنات</h1>
+        <p class="page-subtitle">إدارة الشاحنات</p>
+    </div>
+
+    <div class="topbar__actions">
+        <a class="btn btn--primary" asp-controller="Trucks" asp-action="Index" aria-label="تحديث الصفحة">تحديث</a>
+    </div>
+</header>
+
+<section class="content" aria-live="polite">
+    <section class="panel">
+        <div class="panel__header">
+            <h2 class="panel__title">الشاحنات</h2>
+            <div class="panel__meta">@((Model?.Count() ?? 0)) سجلات</div>
+        </div>
+
+        <div class="table-wrap">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>الكود</th>
+                        <th>السائق</th>
+                        <th>الحالة</th>
+                        <th>المناطق المسندة</th>
+                        <th>إجراءات</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    @if (Model != null && Model.Any())
+                    {
+                        foreach (var t in Model)
+                        {
+                            <tr>
+                                <td>TRK-@t.Id.ToString("D2")</td>
+
+                                <td>@(t.Driver?.FullName ?? "—")</td>
+
+                                <td>
+                                    @if (t.IsActive)
+                                    {
+                                        <span class="badge badge--success">متاحة</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge badge--warn">غير متاحة</span>
+                                    }
+                                </td>
+
+                                <td>
+                                    @if (t.Driver?.Area != null)
+                                    {
+                                        @t.Driver.Area.Name
+                                    }
+                                    else
+                                    {
+                                        <span style="opacity:.6;">—</span>
+                                    }
+                                </td>
+
+                                <td>
+                                    <div class="row-actions">
+                                        <a class="btn btn--sm"
+                                           asp-controller="Trucks"
+                                           asp-action="Details"
+                                           asp-route-id="@t.Id">تفاصيل</a>
+
+                                        <a class="btn btn--sm btn--primary"
+                                           asp-controller="Trucks"
+                                           asp-action="Edit"
+                                           asp-route-id="@t.Id">تعديل</a>
+
+                                        <form asp-controller="Trucks"
+                                              asp-action="Delete"
+                                              asp-route-id="@t.Id"
+                                              method="post"
+                                              style="display:inline">
+                                            @Html.AntiForgeryToken()
+                                            <button class="btn btn--sm btn--danger" type="submit">حذف</button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="5" style="text-align:center; opacity:.8;">لا توجد شاحنات.</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        <div class="panel__footer">
+            <a class="btn btn--primary" asp-controller="Trucks" asp-action="Create">إضافة شاحنة</a>
+        </div>
+    </section>
+</section>

@@ -1,0 +1,154 @@
+﻿@model CleanCity.MVC.Models.AwarenessContentViewModel
+
+<header class="topbar">
+    <button class="icon-btn topbar__menu" id="btnMobileMenu" type="button" aria-label="فتح القائمة">
+        <span class="icon" aria-hidden="true">≡</span>
+    </button>
+    <div class="topbar__title">
+        <h1 class="page-title">تعديل مقال</h1>
+        <p class="page-subtitle">ART-@Model.Id.ToString("D2")</p>
+    </div>
+    <div class="topbar__actions">
+        <a class="btn" asp-controller="AwarenessContents" asp-action="Index">رجوع</a>
+    </div>
+</header>
+
+<section class="content" aria-live="polite">
+    <section class="panel">
+        <div class="panel__header">
+            <h2 class="panel__title">تعديل المقال</h2>
+            <div class="panel__meta">ART-@Model.Id.ToString("D2")</div>
+        </div>
+
+        <form style="padding:14px"
+              asp-controller="AwarenessContents"
+              asp-action="Edit"
+              asp-route-id="@Model.Id"
+              method="post"
+              enctype="multipart/form-data">
+            @Html.AntiForgeryToken()
+
+            <input type="hidden" asp-for="Id" />
+            <input type="hidden" asp-for="CreatedAt" />
+            <input type="hidden" asp-for="ExistingImageUrl" />
+
+            <div class="filters" style="grid-template-columns:1fr; align-items:start">
+
+                <label class="field">
+                    <span class="field__label">العنوان</span>
+                    <input class="field__control"
+                           asp-for="Title"
+                           type="text"
+                           placeholder="اكتب عنواناً واضحاً للمقال" />
+                    <span asp-validation-for="Title" class="text-danger"></span>
+                </label>
+
+                <label class="field">
+                    <span class="field__label">محتوى المقال</span>
+                    <textarea class="field__control"
+                              asp-for="Content"
+                              rows="12"
+                              placeholder="اكتب محتوى المقال التوعوي هنا..."></textarea>
+                    <span asp-validation-for="Content" class="text-danger"></span>
+                </label>
+
+                @if (!string.IsNullOrEmpty(Model.ExistingImageUrl))
+                {
+                    <div class="field">
+                        <span class="field__label">الصورة الحالية</span>
+                        <div id="currentImageBox" style="margin-top:6px; text-align:center;">
+                            <img src="@Model.ExistingImageUrl"
+                                 alt="صورة المقال"
+                                 style="max-width:100%; max-height:250px; border-radius:10px; border:2px solid rgba(0,0,0,.1); box-shadow:0 2px 8px rgba(0,0,0,.1);" />
+                        </div>
+                    </div>
+                }
+
+                <label class="field">
+                    <span class="field__label">صورة جديدة (اختياري)</span>
+                    <input class="field__control"
+                           asp-for="ImageFile"
+                           type="file"
+                           accept="image/*"
+                           onchange="previewImage(this)" />
+                    <span asp-validation-for="ImageFile" class="text-danger"></span>
+                </label>
+
+                <div id="imagePreview" style="display:none; margin-top:10px; text-align:center;">
+                    <p style="color:#198754; font-weight:700; margin-bottom:6px;">معاينة الصورة الجديدة</p>
+                    <img id="previewImg"
+                         src=""
+                         alt="معاينة الصورة"
+                         style="max-width:100%; max-height:250px; border-radius:10px; border:2px solid #198754; box-shadow:0 2px 8px rgba(0,0,0,.1);" />
+                    <br />
+                    <button type="button"
+                            class="btn btn--sm"
+                            style="margin-top:8px"
+                            onclick="clearImage()">
+                        إلغاء الصورة الجديدة
+                    </button>
+                </div>
+
+            </div>
+
+            <div style="display:flex; gap:10px; margin-top:14px">
+                <button type="submit" class="btn btn--primary">حفظ التعديل</button>
+                <a class="btn" asp-controller="AwarenessContents" asp-action="Index">إلغاء</a>
+            </div>
+
+            <div style="margin-top:10px">
+                @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+            </div>
+        </form>
+    </section>
+</section>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+
+    <script>
+        function previewImage(input) {
+            var preview = document.getElementById('imagePreview');
+            var img = document.getElementById('previewImg');
+            var currentBox = document.getElementById('currentImageBox');
+
+            if (input.files && input.files[0]) {
+                var reader = new FileReader();
+
+                reader.onload = function (e) {
+                    img.src = e.target.result;
+                    preview.style.display = 'block';
+
+                    if (currentBox) {
+                        currentBox.style.opacity = '0.4';
+                    }
+                };
+
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+
+        function clearImage() {
+            var fileInput = document.getElementById('ImageFile');
+            var preview = document.getElementById('imagePreview');
+            var img = document.getElementById('previewImg');
+            var currentBox = document.getElementById('currentImageBox');
+
+            if (fileInput) {
+                fileInput.value = '';
+            }
+
+            if (preview) {
+                preview.style.display = 'none';
+            }
+
+            if (img) {
+                img.src = '';
+            }
+
+            if (currentBox) {
+                currentBox.style.opacity = '1';
+            }
+        }
+    </script>
+}

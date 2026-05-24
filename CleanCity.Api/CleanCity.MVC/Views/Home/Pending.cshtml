@@ -1,0 +1,152 @@
+﻿@model CleanCity.MVC.Models.PendingReportsVm
+@{
+    ViewData["Title"] = "البلاغات العالقة";
+}
+
+<header class="topbar">
+    <button class="icon-btn topbar__menu" id="btnMobileMenu" type="button" aria-label="فتح القائمة">
+        <span class="icon" aria-hidden="true">≡</span>
+    </button>
+
+    <div class="topbar__title">
+        <h1 class="page-title">البلاغات العالقة</h1>
+        <p class="page-subtitle">بلاغات مرفوضة تحتاج إجراء</p>
+    </div>
+
+    <div class="topbar__actions">
+        <a class="btn btn--primary" asp-controller="Home" asp-action="Pending">تحديث</a>
+    </div>
+</header>
+
+<section class="content" aria-live="polite">
+
+    <!-- مرفوضة من السائق -->
+    <section class="panel">
+        <div class="panel__header">
+            <h2 class="panel__title">بلاغات مرفوضة من السائق</h2>
+            <div class="panel__meta">@Model.DriverRejected.Count سجلات</div>
+        </div>
+
+        <div class="table-wrap">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>رقم</th>
+                        <th>المنطقة</th>
+                        <th>السائق</th>
+                        <th>سبب الرفض</th>
+                        <th>وقت الرفض</th>
+                        <th>إجراءات</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model.DriverRejected.Any())
+                    {
+                        foreach (var r in Model.DriverRejected)
+                        {
+                            <tr>
+                                <td>#@r.ReportId</td>
+                                <td>@r.AreaName</td>
+                                <td>@r.DriverName</td>
+                                <td>@(string.IsNullOrWhiteSpace(r.RejectionReason) ? "—" : r.RejectionReason)</td>
+                                <td>@(r.RejectedAt?.ToString("yyyy-MM-dd HH:mm") ?? "—")</td>
+                                <td>
+                                    <div style="display:flex; gap:8px; flex-wrap:wrap">
+                                        <a class="btn btn--sm"
+                                           asp-controller="Home"
+                                           asp-action="Details"
+                                           asp-route-id="@r.ReportId">عرض</a>
+
+                                        <!-- إعادة إسناد: تحتاج Action تنفذه لاحقًا -->
+                                        <a class="btn btn--sm btn--primary"
+                                           asp-controller="Home"
+                                           asp-action="Reassign"
+                                           asp-route-id="@r.ReportId">إسناد</a>
+                                    </div>
+                                </td>
+
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr><td colspan="6" style="text-align:center; opacity:.8;">لا توجد بلاغات مرفوضة من السائق.</td></tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        <div class="panel__footer">
+            <p class="panel__meta" style="margin:0">هذه بيانات حقيقية من قاعدة البيانات.</p>
+        </div>
+    </section>
+
+    <!-- مرفوضة من AI -->
+    <section class="panel" style="margin-top:16px">
+        <div class="panel__header">
+            <h2 class="panel__title">بلاغات مرفوضة من مودل الذكاء الصناعي</h2>
+            <div class="panel__meta">@Model.AiRejected.Count سجلات</div>
+        </div>
+
+        <div class="table-wrap">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>رقم</th>
+                        <th>المنطقة</th>
+                        <th>سبب الرفض (AI)</th>
+                        <th>الثقة</th>
+                        <th>السائق المقترح</th>
+                        <th>وقت القرار</th>
+                        <th>إجراءات</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model.AiRejected.Any())
+                    {
+                        foreach (var r in Model.AiRejected)
+                        {
+                            <tr>
+                                <td>#@r.ReportId</td>
+                                <td>@r.AreaName</td>
+                                <td>@(string.IsNullOrWhiteSpace(r.AiReason) ? "—" : r.AiReason)</td>
+                                <td>
+                                    @if (r.Confidence.HasValue)
+                                    {
+                                        <span class="badge badge--info">@r.Confidence.Value.ToString("0.00")</span>
+                                    }
+                                    else
+                                    {
+                                        <span>—</span>
+                                    }
+                                </td>
+                                <td>@r.SuggestedDriverName</td>
+                                <td>@(r.DecidedAt?.ToString("yyyy-MM-dd HH:mm") ?? "—")</td>
+                                <td>
+                                    <div style="display:flex; gap:8px; flex-wrap:wrap">
+                                        <a class="btn btn--sm"
+                                           asp-controller="Home"
+                                           asp-action="Details"
+                                           asp-route-id="@r.ReportId">مراجعة</a>
+
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr><td colspan="7" style="text-align:center; opacity:.8;">لا توجد بلاغات مرفوضة من AI.</td></tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        <div class="panel__footer">
+            <p class="panel__meta" style="margin:0">
+                الإجراء المقترح: <strong>مراجعة البلاغ</strong> ثم <strong>إسناده</strong> أو <strong>تجاهله</strong>.
+            </p>
+        </div>
+    </section>
+
+</section>

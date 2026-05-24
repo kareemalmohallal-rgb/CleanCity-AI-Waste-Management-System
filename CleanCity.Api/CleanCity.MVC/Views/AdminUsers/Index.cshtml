@@ -1,0 +1,100 @@
+﻿@model IEnumerable<CleanCity.MVC.Models.DriverUserVm>
+
+<header class="topbar">
+    <button class="icon-btn topbar__menu" id="btnMobileMenu" type="button" aria-label="فتح القائمة">
+        <span class="icon" aria-hidden="true">≡</span>
+    </button>
+
+    <div class="topbar__title">
+        <h1 class="page-title">مستخدمو النظام</h1>
+        <p class="page-subtitle">السائقون المرتبطون بحسابات</p>
+    </div>
+
+    <div class="topbar__actions">
+        <a class="btn btn--primary"
+           asp-controller="AdminUsers"
+           asp-action="Index"
+           aria-label="تحديث الصفحة">تحديث</a>
+    </div>
+</header>
+
+<section class="content" aria-live="polite">
+    <section class="panel">
+        <div class="panel__header">
+            <h2 class="panel__title">قائمة المستخدمين (السائقون)</h2>
+            <div class="panel__meta">@((Model?.Count() ?? 0)) سجلات</div>
+        </div>
+
+        <div class="table-wrap">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>السائق</th>
+                        <th>اسم المستخدم</th>
+                        <th>رقم الهاتف</th>
+                        <th>كلمة المرور</th>
+                        <th>رقم الرخصة</th>
+                        <th>الشاحنة</th>
+                        <th>المنطقة</th>
+                        <th>الحالة</th>
+                        <th>إجراءات</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model != null && Model.Any())
+                    {
+                        foreach (var u in Model)
+                        {
+                            <tr>
+                                <td>@u.FullName</td>
+                                <td>@u.UserName</td>
+                                <td>@u.PhoneNumber</td>
+                                <td>
+                                    <span style="letter-spacing:2px; opacity:.7">••••••••</span>
+                                </td>
+                                <td>@(u.LicenseNumber ?? "—")</td>
+                                <td>@(u.TruckName ?? "—")</td>
+                                <td>@(u.AreaName ?? "—")</td>
+                                <td>
+                                    @if (u.IsLinked)
+                                    {
+                                        <span class="badge badge--success">مرتبط</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge badge--warn">غير مرتبط</span>
+                                    }
+                                </td>
+                                <td>
+                                    <div class="row-actions">
+                                        <a class="btn btn--sm btn--primary"
+                                           asp-controller="AdminUsers"
+                                           asp-action="Edit"
+                                           asp-route-id="@u.UserId">تعديل</a>
+
+                                        <a class="btn btn--sm btn--danger"
+                                           asp-controller="AdminUsers"
+                                           asp-action="Delete"
+                                           asp-route-id="@u.UserId">حذف</a>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="9" style="text-align:center; opacity:.8;">لا يوجد مستخدمون مسجّلون.</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        <div class="panel__footer">
+            <a class="btn btn--primary"
+               asp-controller="Drivers"
+               asp-action="Index">إدارة السائقين</a>
+        </div>
+    </section>
+</section>

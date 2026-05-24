@@ -1,0 +1,95 @@
+﻿@model IEnumerable<CleanCity.MVC.Models.DriverIndexVm>
+
+<header class="topbar">
+    <button class="icon-btn topbar__menu" id="btnMobileMenu" type="button" aria-label="فتح القائمة">
+        <span class="icon" aria-hidden="true">≡</span>
+    </button>
+
+    <div class="topbar__title">
+        <h1 class="page-title">عرض السائقين</h1>
+        <p class="page-subtitle">قائمة السائقين</p>
+    </div>
+
+    <div class="topbar__actions">
+        <a class="btn btn--primary" asp-controller="Drivers" asp-action="Index" aria-label="تحديث الصفحة">تحديث</a>
+    </div>
+</header>
+
+<section class="content" aria-live="polite">
+    <section class="panel">
+        <div class="panel__header">
+            <h2 class="panel__title">السائقين</h2>
+            <div class="panel__meta">@((Model?.Count() ?? 0)) سجلات</div>
+        </div>
+
+        <div class="table-wrap">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>الكود</th>
+                        <th>اسم السائق</th>
+                        <th>اسم المستخدم</th>
+                        <th>الشاحنة</th>
+                        <th>المنطقة</th>
+                        <th>الحالة</th>
+                        <th>إجراءات</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    @if (Model != null && Model.Any())
+                    {
+                        foreach (var d in Model)
+                        {
+                            <tr>
+                                <td>DRV-@d.Id.ToString("D2")</td>
+                                <td>@d.FullName</td>
+                                <td>@(d.UserName ?? "—")</td>
+                                <td>@(d.TruckName ?? "—")</td>
+                                <td>@(d.AreaName ?? "—")</td>
+                                <td>
+                                    @if (d.IsActive)
+                                    {
+                                        <span class="badge badge--success">نشط</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge badge--warn">غير نشط</span>
+                                    }
+                                </td>
+                                <td>
+                                    <div class="row-actions">
+                                        <a class="btn btn--sm"
+                                           asp-controller="Drivers"
+                                           asp-action="Details"
+                                           asp-route-id="@d.Id">تفاصيل</a>
+
+                                        <a class="btn btn--sm btn--primary"
+                                           asp-controller="Drivers"
+                                           asp-action="Edit"
+                                           asp-route-id="@d.Id">تعديل</a>
+
+                                        <a class="btn btn--sm btn--danger"
+                                           asp-controller="Drivers"
+                                           asp-action="Delete"
+                                           asp-route-id="@d.Id">حذف</a>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="7" style="text-align:center; opacity:.8;">لا توجد بيانات سائقين.</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        <div class="panel__footer">
+            <a class="btn btn--primary" asp-controller="Drivers" asp-action="Create">إضافة سائق</a>
+        </div>
+    </section>
+</section>

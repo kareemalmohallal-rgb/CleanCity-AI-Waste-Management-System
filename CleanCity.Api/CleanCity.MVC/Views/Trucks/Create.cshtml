@@ -1,0 +1,110 @@
+﻿@model CleanCity.Domain.Entities.Truck
+
+    <header class="topbar">
+        <button class="icon-btn topbar__menu" id="btnMobileMenu" type="button" aria-label="فتح القائمة">
+            <span class="icon" aria-hidden="true">≡</span>
+        </button>
+
+        <div class="topbar__title">
+            <h1 class="page-title">إضافة شاحنة</h1>
+            
+        </div>
+
+        <div class="topbar__actions">
+            <a class="btn btn--primary" href="" aria-label="تحديث الصفحة">تحديث</a>
+        </div>
+    </header>
+
+    <section class="content" aria-live="polite">
+        <section class="panel">
+            <div class="panel__header">
+                <h2 class="panel__title">إضافة شاحنة</h2>
+                <div class="panel__meta">تعريف شاحنة</div>
+            </div>
+
+            <form style="padding:14px"
+                  asp-controller="Trucks"
+                  asp-action="Create"
+                  method="post">
+                @Html.AntiForgeryToken()
+
+                <div class="filters" style="grid-template-columns:1fr 1fr; align-items:start">
+
+                    <!-- Name -->
+                    <label class="field">
+                        <span class="field__label">Name</span>
+                        <input class="field__control"
+                               asp-for="Name"
+                               type="text"
+                               placeholder="مثال: شاحنة النظافة 1"
+                               required />
+                        <span asp-validation-for="Name" class="text-danger"></span>
+                    </label>
+
+                    <!-- Number -->
+                    <label class="field">
+                        <span class="field__label">Number</span>
+                        <input class="field__control"
+                               asp-for="Number"
+                               type="text"
+                               placeholder="مثال: TRK-01 أو 12345"
+                               required />
+                        <span asp-validation-for="Number" class="text-danger"></span>
+                    </label>
+
+                    <!-- Size -->
+                    <label class="field">
+                        <span class="field__label">Size</span>
+                        <input class="field__control"
+                               asp-for="Size"
+                               type="text"
+                               placeholder="مثال: 10 طن / 6m³" />
+                        <span asp-validation-for="Size" class="text-danger"></span>
+                    </label>
+
+                    <!-- الحالة (⚠️ انتبه: لو عندك IsActive bool فهذا غير مناسب) -->
+                    <label class="field">
+                        <span class="field__label">الحالة</span>
+                        <select class="field__control" asp-for="IsActive">
+                            <option value="true">متاحة</option>
+                            <option value="false">متوقفة</option>
+                        </select>
+                        <span asp-validation-for="IsActive" class="text-danger"></span>
+                    </label>
+
+                    <!-- النوع (TruckTypeId) -->
+                    <label class="field">
+                        <span class="field__label">النوع</span>
+                        <select class="field__control" asp-for="TruckTypeId"
+                                asp-items="ViewBag.TruckTypes">
+                            <option value="">اختر النوع</option>
+                        </select>
+                        <span asp-validation-for="TruckTypeId" class="text-danger"></span>
+                    </label>
+
+                    <!-- DriverId -->
+                    <label class="field">
+                        <span class="field__label">السائق</span>
+                        <select class="field__control" asp-for="DriverId"
+                                asp-items="ViewBag.Drivers">
+                            <option value="">اختر السائق</option>
+                        </select>
+                        <span asp-validation-for="DriverId" class="text-danger"></span>
+                    </label>
+
+                    <div class="filters__actions" style="align-self:end">
+                        <!-- مسح: يرجع لنفس Create لتفريغ الحقول -->
+                        <a class="btn" asp-controller="Trucks" asp-action="Create">مسح</a>
+
+                        <!-- حفظ -->
+                        <button class="btn btn--primary" type="submit">حفظ</button>
+                    </div>
+
+                </div>
+
+                <div style="margin-top:10px">
+                    @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+                </div>
+            </form>
+        </section>
+    </section>

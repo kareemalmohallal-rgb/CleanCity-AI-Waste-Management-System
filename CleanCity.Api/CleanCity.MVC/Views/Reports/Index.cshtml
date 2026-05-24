@@ -1,0 +1,249 @@
+﻿@model CleanCity.MVC.Models.ReportListVm
+@using CleanCity.Domain.Enum
+@{
+    ViewData["Title"] = "البلاغات";
+
+    // ── مساعد بناء رابط الصفحة مع الحفاظ على الفلاتر الحالية ─────────────
+    string PageUrl(int targetPage) =>
+        Url.Action("Index", "Reports", new
+        {
+            status = Model.FilterStatus.HasValue ? (int)Model.FilterStatus : (int?)null,
+            areaId = Model.FilterAreaId,
+            dateFrom = Model.FilterDateFrom?.ToString("yyyy-MM-dd"),
+            dateTo = Model.FilterDateTo?.ToString("yyyy-MM-dd"),
+            search = Model.FilterSearch,
+            page = targetPage,
+            pageSize = Model.PageSize
+        })!;
+}
+
+<!-- ── Top Bar ──────────────────────────────────────────────────────────── -->
+<header class="topbar">
+    <button class="icon-btn topbar__menu" id="btnMobileMenu" type="button" aria-label="فتح القائمة">
+        <span class="icon" aria-hidden="true">≡</span>
+    </button>
+
+    <div class="topbar__title">
+        <h1 class="page-title">البلاغات</h1>
+        <p class="page-subtitle">
+            إجمالي: <strong>@Model.Paged.TotalCount</strong> بلاغ
+        </p>
+    </div>
+
+    <div class="topbar__actions">
+        <a class="btn btn--primary" asp-controller="Reports" asp-action="Index">تحديث</a>
+    </div>
+</header>
+
+<!-- ── TempData Alerts ────────────────────────────────────────────────── -->
+@if (TempData["Success"] is string successMsg)
+{
+    <div class="toast toast--success" role="alert">@successMsg</div>
+}
+
+<section class="content">
+
+    <!-- ── فلاتر البحث ─────────────────────────────────────────────────── -->
+    <section class="panel" aria-label="فلاتر البحث">
+        <div class="panel__header">
+            <h2 class="panel__title">تصفية البلاغات</h2>
+        </div>
+
+        <form method="get" asp-controller="Reports" asp-action="Index" class="filters">
+
+            <!-- ── فلتر الحالة ──────────────────────────────────────── -->
+            @{
+                var currentStatusVal = Model.FilterStatus.HasValue
+                ? ((int)Model.FilterStatus.Value).ToString()
+                : "";
+            }
+            <label class="field">
+                <span class="field__label">الحالة</span>
+                <select name="status" class="field__control">
+                    <option value="" selected="@(currentStatusVal == "" ? "selected" : null)">الكل</option>
+                    <option value="0" selected="@(currentStatusVal == "0" ? "selected" : null)">مستلم</option>
+                    <option value="1" selected="@(currentStatusVal == "1" ? "selected" : null)">قيد التنفيذ</option>
+                    <option value="2" selected="@(currentStatusVal == "2" ? "selected" : null)">تحت المراجعة</option>
+                    <option value="3" selected="@(currentStatusVal == "3" ? "selected" : null)">مكتمل</option>
+                    <option value="4" selected="@(currentStatusVal == "4" ? "selected" : null)">مرفوض</option>
+                </select>
+            </label>
+
+            <!-- ── فلتر المنطقة ─────────────────────────────────────── -->
+            <label class="field">
+                <span class="field__label">المنطقة</span>
+                <select name="areaId" class="field__control"
+                        asp-items="Model.AreaOptions">
+                </select>
+            </label>
+
+            <!-- من تاريخ -->
+            <label class="field">
+                <span class="field__label">من تاريخ</span>
+                <input type="date" name="dateFrom" class="field__control"
+                       value="@Model.FilterDateFrom?.ToString("yyyy-MM-dd")" />
+            </label>
+
+            <!-- إلى تاريخ -->
+            <label class="field">
+                <span class="field__label">إلى تاريخ</span>
+                <input type="date" name="dateTo" class="field__control"
+                       value="@Model.FilterDateTo?.ToString("yyyy-MM-dd")" />
+            </label>
+
+            <!-- بحث نصي -->
+            <label class="field">
+                <span class="field__label">بحث</span>
+                <input type="search" name="search" class="field__control"
+                       placeholder="رقم، وصف، سائق، منطقة..."
+                       value="@Model.FilterSearch" autocomplete="off" />
+            </label>
+
+            <!-- حجم الصفحة -->
+            <input type="hidden" name="pageSize" value="@Model.PageSize" />
+            <input type="hidden" name="page" value="1" />
+
+            <div class="field" style="justify-content:flex-end; align-items:flex-end; display:flex; flex-direction:row; gap:8px;">
+                <button type="submit" class="btn btn--primary">تطبيق</button>
+                <a class="btn" asp-controller="Reports" asp-action="Index">إعادة ضبط</a>
+            </div>
+        </form>
+    </section>
+
+    <!-- ── جدول البلاغات ────────────────────────────────────────────────── -->
+    <section class="panel" aria-label="جدول البلاغات" style="margin-top:16px">
+        <div class="panel__header">
+            <h2 class="panel__title">قائمة البلاغات</h2>
+            <div class="panel__meta">
+                صفحة @Model.Paged.Page من @Model.Paged.TotalPages
+                (@Model.Paged.TotalCount إجمالي)
+            </div>
+        </div>
+
+        <div class="table-wrap" role="region" aria-label="جدول البلاغات" tabindex="0">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>الرقم</th>
+                        <th>المنطقة</th>
+                        <th>السائق</th>
+                        <th>الحالة</th>
+                        <th>تحليل AI</th>
+                        <th>الوقت</th>
+                        <th>إجراءات</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (!Model.Paged.Items.Any())
+                    {
+                        <tr>
+                            <td colspan="7" style="text-align:center;padding:24px;opacity:.7">
+                                لا توجد بلاغات تطابق الفلاتر المحددة.
+                            </td>
+                        </tr>
+                    }
+                    else
+                    {
+                        foreach (var r in Model.Paged.Items)
+                        {
+                            <tr>
+                                <td><strong>@r.Id</strong></td>
+                                <td>@r.AreaName</td>
+                                <td>@r.DriverName</td>
+                                <td>
+                                    <span class="@CleanCity.MVC.Models.ReportListVm.StatusBadgeClass(r.StatusKey)">
+                                        @r.StatusAr
+                                    </span>
+                                </td>
+                                <td>
+                                    @if (r.AiGarbageDetected.HasValue)
+                                    {
+                                        if (r.AiGarbageDetected.Value)
+                                        {
+                                            <span class="badge badge--success" title="نسبة الثقة: @r.AiConfidence?.ToString("0.0")%">
+                                                ✓ نفايات
+                                            </span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge badge--neutral" title="سبب: لم تُكتشف نفايات">
+                                                ✗ مرفوض AI
+                                            </span>
+                                        }
+                                    }
+                                    else
+                                    {
+                                        <span style="opacity:.5">—</span>
+                                    }
+                                </td>
+                                <td style="white-space:nowrap">
+                                    @r.CreatedAt.ToLocalTime().ToString("yyyy-MM-dd")
+                                    <br />
+                                    <small style="opacity:.7">@r.CreatedAt.ToLocalTime().ToString("HH:mm")</small>
+                                </td>
+                                <td>
+                                    <div style="display:flex;gap:6px;flex-wrap:wrap">
+                                        <a class="btn btn--sm"
+                                           asp-controller="Reports"
+                                           asp-action="Details"
+                                           asp-route-id="@r.Id">
+                                            عرض
+                                        </a>
+
+                                        @if (r.StatusKey == "received" || r.StatusKey == "rejected")
+                                        {
+                                            <a class="btn btn--sm btn--primary"
+                                               asp-controller="Reports"
+                                               asp-action="Reassign"
+                                               asp-route-id="@r.Id">
+                                                إسناد
+                                            </a>
+                                        }
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        <!-- ── Pagination ──────────────────────────────────────────────── -->
+        @if (Model.Paged.TotalPages > 1)
+        {
+            <div class="panel__footer" style="justify-content:center;gap:8px;display:flex;flex-wrap:wrap">
+
+                @* الصفحة الأولى *@
+                @if (Model.Paged.HasPreviousPage)
+                {
+                    <a class="btn btn--sm" href="@PageUrl(1)" aria-label="الأولى">«</a>
+                    <a class="btn btn--sm" href="@PageUrl(Model.Paged.Page - 1)" aria-label="السابقة">‹</a>
+                }
+
+                @* أرقام الصفحات (نافذة ±2 من الصفحة الحالية) *@
+                @{
+                    var start = Math.Max(1, Model.Paged.Page - 2);
+                    var end = Math.Min(Model.Paged.TotalPages, Model.Paged.Page + 2);
+                }
+                @for (var p = start; p <= end; p++)
+                {
+                    var isCurrent = p == Model.Paged.Page;
+                    <a class="btn btn--sm @(isCurrent ? "btn--primary" : "")"
+                       href="@PageUrl(p)"
+                       aria-current="@(isCurrent ? "page" : null)">
+                        @p
+                    </a>
+                }
+
+                @if (Model.Paged.HasNextPage)
+                {
+                    <a class="btn btn--sm" href="@PageUrl(Model.Paged.Page + 1)" aria-label="التالية">›</a>
+                    <a class="btn btn--sm" href="@PageUrl(Model.Paged.TotalPages)" aria-label="الأخيرة">»</a>
+                }
+
+            </div>
+        }
+
+    </section>
+
+</section>

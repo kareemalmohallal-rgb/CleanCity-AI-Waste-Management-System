@@ -1,0 +1,216 @@
+```gitignore
+# =========================================================
+# CLEAN CITY - GLOBAL .GITIGNORE
+# ASP.NET Core + Flutter + Python AI + VS + VSCode
+# =========================================================
+
+# =========================================================
+# GENERAL
+# =========================================================
+.DS_Store
+Thumbs.db
+*.log
+*.tmp
+*.temp
+*.swp
+*.bak
+
+# =========================================================
+# GIT / ENV / SECRETS
+# =========================================================
+.env
+.env.*
+*.key
+*.pem
+*.pfx
+*.snk
+*.pubxml
+secrets.json
+appsettings.Production.json
+firebase-adminsdk*.json
+serviceAccountKey.json
+
+# Keys folder
+keys/
+Keys/
+secret/
+secrets/
+
+# =========================================================
+# VISUAL STUDIO
+# =========================================================
+.vs/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# =========================================================
+# ASP.NET CORE / .NET
+# =========================================================
+bin/
+obj/
+publish/
+TestResults/
+
+# Rider / Resharper
+_ReSharper*/
+*.DotSettings.user
+
+# NuGet
+*.nupkg
+packages/
+.nuget/
+
+# Entity Framework
+*.dbmdl
+
+# IIS
+iisexpress/
+
+# Logs
+logs/
+*.db-shm
+*.db-wal
+
+# SQLite
+*.sqlite
+*.sqlite3
+*.db
+
+# ASP.NET generated
+wwwroot/uploads/
+wwwroot/temp/
+wwwroot/images/uploads/
+
+# =========================================================
+# FLUTTER / DART
+# =========================================================
+.flutter-plugins
+.flutter-plugins-dependencies
+.dart_tool/
+.packages
+.pub-cache/
+.pub/
+build/
+
+# Flutter generated
+**/android/app/debug
+**/android/app/profile
+**/android/app/release
+
+# Android
+**/android/.gradle/
+**/android/local.properties
+**/android/captures/
+**/android/key.properties
+**/*.jks
+**/*.keystore
+
+# iOS
+**/ios/Pods/
+**/ios/.symlinks/
+**/ios/Flutter/Flutter.framework
+**/ios/Flutter/Flutter.podspec
+**/ios/Flutter/Generated.xcconfig
+**/ios/Flutter/app.flx
+**/ios/Flutter/flutter_assets/
+**/ios/Flutter/flutter_export_environment.sh
+
+# macOS
+**/macos/Flutter/ephemeral/
+
+# Linux
+**/linux/flutter/ephemeral/
+
+# Windows
+**/windows/flutter/ephemeral/
+
+# =========================================================
+# PYTHON / AI SERVICE
+# =========================================================
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+
+# Virtual Environments
+venv/
+env/
+ENV/
+.venv/
+
+# Python cache/tools
+.pytest_cache/
+.mypy_cache/
+.ipynb_checkpoints/
+
+# AI Models / Weights
+*.pt
+*.pth
+*.onnx
+runs/
+datasets/
+test_results/
+
+# YOLO outputs
+detect/
+results/
+
+# =========================================================
+# VSCODE
+# =========================================================
+.vscode/
+
+# =========================================================
+# NODE (IF EXISTS)
+# =========================================================
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# =========================================================
+# DOCKER
+# =========================================================
+docker-compose.override.yml
+
+# =========================================================
+# COVERAGE
+# =========================================================
+coverage/
+*.coverage
+coverage.xml
+
+# =========================================================
+# GENERATED FILES
+# =========================================================
+Generated/
+generated/
+
+# =========================================================
+# TEMP FILES
+# =========================================================
+tmp/
+temp/
+
+# =========================================================
+# OPTIONAL LARGE FILES
+# =========================================================
+*.zip
+*.rar
+*.7z
+
+# =========================================================
+# AI DATASETS (OPTIONAL)
+# =========================================================
+dataset/
+data/
+images/
+labels/
+
+# =========================================================
+# KEEP IMPORTANT EMPTY FOLDERS
+# =========================================================
+!.gitkeep
+```

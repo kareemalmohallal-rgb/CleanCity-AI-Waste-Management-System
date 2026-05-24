@@ -1,0 +1,71 @@
+﻿.filters {
+    padding: 14px;
+    display: grid;
+    grid-template-columns: 1fr 1fr 1.4fr auto;
+    gap: 12px;
+    align-items: end;
+}
+
+.field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.field__label {
+    color: var(--muted);
+    font-size: .92rem;
+}
+
+.field__control {
+    height: 44px;
+    padding: 10px 12px;
+    border-radius: 12px;
+    border: 1px solid rgba(255,255,255,.10);
+    background: rgba(0,0,0,.18);
+    color: var(--text);
+    outline: none;
+    /* ✅ إصلاح Chrome — بدونه لا يطبق Chrome أي تنسيق على <select> */
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+}
+
+    .field__control:focus {
+        border-color: rgba(79,140,255,.6);
+        box-shadow: 0 0 0 4px rgba(79,140,255,.15);
+    }
+
+    /* ✅ لون خيارات القائمة — Edge / Firefox */
+    .field__control option {
+        background: #0f1a2b;
+        color: #ffffff;
+    }
+
+        .field__control option[value=""] {
+            color: var(--muted);
+        }
+
+/* ✅ سهم مخصص لـ <select> فقط بدلاً من السهم الافتراضي المحذوف */
+select.field__control {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='7' viewBox='0 0 12 7'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23a9b3c7' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: left 12px center;
+    padding-left: 36px;
+}
+
+.filters__actions {
+    display: flex;
+    gap: 10px;
+    justify-content: flex-start;
+}
+
+@media (max-width: 1100px) {
+    .filters {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .filters__actions {
+        grid-column: 1 / -1;
+    }
+}

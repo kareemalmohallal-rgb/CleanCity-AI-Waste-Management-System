@@ -1,0 +1,118 @@
+﻿@model IEnumerable<CleanCity.Domain.Entities.AwarenessContent>
+
+<header class="topbar">
+    <button class="icon-btn topbar__menu" id="btnMobileMenu" type="button" aria-label="فتح القائمة">
+        <span class="icon" aria-hidden="true">≡</span>
+    </button>
+    <div class="topbar__title">
+        <h1 class="page-title">المقالات التوعوية</h1>
+        <p class="page-subtitle">عرض وإدارة المقالات</p>
+    </div>
+    <div class="topbar__actions">
+        <a class="btn btn--primary"
+           asp-controller="AwarenessContents"
+           asp-action="Index"
+           aria-label="تحديث الصفحة">تحديث</a>
+    </div>
+</header>
+
+<section class="content" aria-live="polite">
+    <section class="panel">
+        <div class="panel__header">
+            <h2 class="panel__title">قائمة المقالات</h2>
+            <div class="panel__meta">@((Model?.Count() ?? 0)) سجلات</div>
+        </div>
+
+        <div class="table-wrap">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>الكود</th>
+                        <th>الصورة</th>
+                        <th>العنوان</th>
+                        <th>تاريخ النشر</th>
+                        <th>إجراءات</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model != null && Model.Any())
+                    {
+                        foreach (var a in Model)
+                        {
+                            <tr>
+                                <td>ART-@a.Id.ToString("D2")</td>
+
+                                <!-- صورة مصغرة -->
+                                <td style="text-align:center; width:70px;">
+                                    @if (!string.IsNullOrEmpty(a.ImageUrl))
+                                    {
+                                        <img src="@a.ImageUrl"
+                                             alt="صورة"
+                                             style="width:50px;
+                                                                height:50px;
+                                                                object-fit:cover;
+                                                                border-radius:8px;
+                                                                border:1px solid rgba(0,0,0,.1);" />
+                                    }
+                                    else
+                                    {
+                                        <span style="opacity:.4; font-size:12px;">—</span>
+                                    }
+                                </td>
+
+                                <td style="max-width:520px;">
+                                    <div style="font-weight:800">@a.Title</div>
+                                    <div style="opacity:.85; margin-top:4px;">
+                                        @{
+                                            var preview = a.Content ?? "";
+                                            if (preview.Length > 140)
+                                            {
+                                                preview = preview.Substring(0, 140) + "…";
+                                            }
+                                        }
+                                        @preview
+                                    </div>
+                                </td>
+
+                                <td>@a.CreatedAt.ToString("yyyy-MM-dd HH:mm")</td>
+
+                                <td>
+                                    <div class="row-actions">
+                                        <a class="btn btn--sm"
+                                           asp-controller="AwarenessContents"
+                                           asp-action="Details"
+                                           asp-route-id="@a.Id">تفاصيل</a>
+
+                                        <a class="btn btn--sm btn--primary"
+                                           asp-controller="AwarenessContents"
+                                           asp-action="Edit"
+                                           asp-route-id="@a.Id">تعديل</a>
+
+                                        <a class="btn btn--sm btn--danger"
+                                           asp-controller="AwarenessContents"
+                                           asp-action="Delete"
+                                           asp-route-id="@a.Id">حذف</a>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="5" style="text-align:center; opacity:.8;">
+                                لا توجد مقالات بعد.
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        <div class="panel__footer">
+            <a class="btn btn--primary"
+               asp-controller="AwarenessContents"
+               asp-action="Create">إضافة مقال</a>
+        </div>
+    </section>
+</section>

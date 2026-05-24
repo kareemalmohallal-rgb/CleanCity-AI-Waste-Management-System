@@ -1,0 +1,593 @@
+﻿@* <!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - CleanCity</title>
+    <link rel="stylesheet" href="~/css/layout.css" />
+    <link rel="stylesheet" href="~/css/toast.css" />
+    <link rel="stylesheet" href="~/css/components/badges.css" />
+    <link rel="stylesheet" href="~/css/components/buttons.css" />
+    <link rel="stylesheet" href="~/css/components/dashboard.css" />
+    <link rel="stylesheet" href="~/css/components/forms.css" />
+    <link rel="stylesheet" href="~/css/components/glass-card.css" />
+    <link rel="stylesheet" href="~/css/components/modal.css" />
+    <link rel="stylesheet" href="~/css/components/sidebar.css" />
+    <link rel="stylesheet" href="~/css/components/stat-card.css" />
+    <link rel="stylesheet" href="~/css/components/table.css" />
+    <link rel="stylesheet" href="~/css/components/topbar.css" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.css" />
+</head>
+<body>
+
+    <div class="app" id="appShell">
+
+        @{
+            var currentController = (ViewContext.RouteData.Values["controller"]?.ToString() ?? "").ToLowerInvariant();
+            var currentAction = (ViewContext.RouteData.Values["action"]?.ToString() ?? "").ToLowerInvariant();
+            string ActiveIf(string controller, string action = "index")
+            => (currentController == controller.ToLowerInvariant() &&
+            currentAction == action.ToLowerInvariant())
+            ? "nav__item nav__item--active" : "nav__item";
+        }
+
+        <aside class="sidebar" id="sidebar" aria-label="القائمة الجانبية">
+
+            <div class="sidebar__brand">
+                <div class="brand">
+                    <span class="brand__logo" aria-hidden="true">CC</span>
+                    <div class="brand__text">
+                        <div class="brand__title">Clean City</div>
+                        <div class="brand__subtitle">وحدة التحكم</div>
+                    </div>
+                </div>
+                <button class="sidebar__toggle" id="btnCollapse" type="button"
+                        aria-label="طي القائمة" title="طي/توسيع القائمة">
+                    &#8250;
+                </button>
+            </div>
+
+            <nav class="nav" aria-label="التنقل">
+
+                <a class="@ActiveIf("home", "index")" asp-controller="Home" asp-action="Index" title="الرئيسية">
+                    <span class="nav__icon">🏠</span><span class="nav__label">الرئيسية</span>
+                </a>
+
+                <div class="nav__section">
+                    <div class="nav__section-title">الإدارة</div>
+                    <a class="@ActiveIf("drivers", "create")" asp-controller="Drivers" asp-action="Create" title="إضافة سائق">
+                        <span class="nav__icon">➕</span><span class="nav__label">إضافة سائق</span>
+                    </a>
+                    <a class="@ActiveIf("drivers", "index")" asp-controller="Drivers" asp-action="Index" title="عرض السائقين">
+                        <span class="nav__icon">👥</span><span class="nav__label">عرض السائقين</span>
+                    </a>
+                    <a class="@ActiveIf("adminUsers", "createuserrequest")" asp-controller="AdminUsers" asp-action="CreateUserRequest" title="إضافة مستخدم">
+                        <span class="nav__icon">➕</span><span class="nav__label">إضافة مستخدم</span>
+                    </a>
+                    <a class="@ActiveIf("adminUsers", "Index")" asp-controller="AdminUsers" asp-action="Index" title="عرض المستخدمين">
+                        <span class="nav__icon">🧑‍💻</span><span class="nav__label">عرض المستخدمين</span>
+                    </a>
+                    <a class="@ActiveIf("areas", "create")" asp-controller="Areas" asp-action="Create" title="إضافة منطقة">
+                        <span class="nav__icon">➕</span><span class="nav__label">إضافة منطقة</span>
+                    </a>
+                    <a class="@ActiveIf("areas", "index")" asp-controller="Areas" asp-action="Index" title="عرض المناطق">
+                        <span class="nav__icon">🗺️</span><span class="nav__label">عرض المناطق</span>
+                    </a>
+                    <a class="@ActiveIf("trucks", "create")" asp-controller="Trucks" asp-action="Create" title="إضافة شاحنة">
+                        <span class="nav__icon">➕</span><span class="nav__label">إضافة شاحنة</span>
+                    </a>
+                    <a class="@ActiveIf("trucks", "index")" asp-controller="Trucks" asp-action="Index" title="عرض الشاحنات">
+                        <span class="nav__icon">🚚</span><span class="nav__label">عرض الشاحنات</span>
+                    </a>
+                    <a class="@ActiveIf("trucktypes", "create")" asp-controller="TruckTypes" asp-action="Create" title="إضافة نوع شاحنة">
+                        <span class="nav__icon">➕</span><span class="nav__label">إضافة نوع شاحنة</span>
+                    </a>
+                    <a class="@ActiveIf("trucktypes", "index")" asp-controller="TruckTypes" asp-action="Index" title="عرض انواع الشاحنات">
+                        <span class="nav__icon">🏷️</span><span class="nav__label">عرض انواع الشاحنات</span>
+                    </a>
+                </div>
+
+                <div class="nav__section">
+                    <div class="nav__section-title">التشغيل</div>
+                    <a class="@ActiveIf("reports", "index")" asp-controller="Reports" asp-action="Index" title="البلاغات">
+                        <span class="nav__icon">📋</span><span class="nav__label">البلاغات</span>
+                    </a>
+                    <a class="@ActiveIf("home", "pending")" asp-controller="Home" asp-action="Pending" title="البلاغات العالقة">
+                        <span class="nav__icon">⏳</span><span class="nav__label">البلاغات العالقة</span>
+                    </a>
+                    <a class="@ActiveIf("home", "hotspots")" asp-controller="Home" asp-action="Hotspots" title="أكثر المناطق بلاغاً">
+                        <span class="nav__icon">🔥</span><span class="nav__label">أكثر المناطق بلاغاً</span>
+                    </a>
+                    @* <a class="@ActiveIf("notifications", "index")" asp-controller="Notifications" asp-action="Index" title="الإشعارات">
+                        <span class="nav__icon">🔔</span><span class="nav__label">الإشعارات</span>
+                    </a> *@
+@* </div>
+
+                <div class="nav__section">
+                    <div class="nav__section-title">الخدمات</div>
+                    <a class="@ActiveIf("sewageserviceproviders", "create")" asp-controller="SewageServiceProviders" asp-action="Create" title="إضافة شفاط مجاري">
+                        <span class="nav__icon">🚽</span><span class="nav__label">إضافة شفاط مجاري</span>
+                    </a>
+                    <a class="@ActiveIf("sewageserviceproviders", "index")" asp-controller="SewageServiceProviders" asp-action="Index" title="شفاطات المجاري">
+                        <span class="nav__icon">📋</span><span class="nav__label">شفاطات المجاري</span>
+                    </a>
+                    <a class="@ActiveIf("awarenesscontents", "create")" asp-controller="AwarenessContents" asp-action="Create" title="إضافة مقال توعوي">
+                        <span class="nav__icon">➕</span><span class="nav__label">إضافة مقال توعوي</span>
+                    </a>
+                    <a class="@ActiveIf("awarenesscontents", "index")" asp-controller="AwarenessContents" asp-action="Index" title="المقالات التوعوية">
+                        <span class="nav__icon">📝</span><span class="nav__label">المقالات التوعوية</span>
+                    </a>
+                </div>
+
+            </nav>
+
+            <div class="sidebar__footer">
+                <div class="user-chip" id="userChip" title="مدير النظام" style="cursor:pointer;">
+                    <span class="user-chip__avatar">A</span>
+                    <div class="user-chip__info">
+                        <div class="user-chip__name">مدير النظام</div>
+                        <div class="user-chip__meta">Admin</div>
+                    </div>
+                </div>
+            </div>
+
+        </aside>
+
+        <main class="main" id="mainContent">
+            @RenderBody()
+        </main>
+
+    </div>
+
+    <script>
+        (function () {
+            var KEY     = 'cc_sidebar_collapsed';
+            var sidebar = document.getElementById('sidebar');
+            var btn     = document.getElementById('btnCollapse');
+            if (!sidebar || !btn) return;
+
+            /* ✅ try/catch يحمي من Edge Tracking Prevention على localStorage */
+            function load()    { try { return localStorage.getItem(KEY); } catch(e) { return null; } }
+            function save(val) { try { localStorage.setItem(KEY, val);   } catch(e) {} }
+
+            if (load() === '1') sidebar.classList.add('sidebar--collapsed');
+
+            btn.addEventListener('click', function () {
+                save(sidebar.classList.toggle('sidebar--collapsed') ? '1' : '0');
+            });
+
+            var mb = document.getElementById('btnMobileMenu');
+            if (mb) mb.addEventListener('click', function () { sidebar.classList.toggle('is-open'); });
+        })();
+              // سكربت الخروج
+        document.addEventListener('DOMContentLoaded', function () {
+            var userChip = document.getElementById('userChip');
+            if (userChip) {
+                userChip.addEventListener('click', function () {
+                    if (confirm('هل تريد تسجيل الخروج؟')) {
+                        // غيّر الرابط إذا كان لديك رابط logout آخر
+                        window.location.href = '/login/Index';
+                        
+                    }
+                });
+            }
+        });
+    </script>
+
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>
+*@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - CleanCity</title>
+    <link rel="stylesheet" href="~/css/layout.css" />
+    <link rel="stylesheet" href="~/css/toast.css" />
+    <link rel="stylesheet" href="~/css/components/badges.css" />
+    <link rel="stylesheet" href="~/css/components/buttons.css" />
+    <link rel="stylesheet" href="~/css/components/dashboard.css" />
+    <link rel="stylesheet" href="~/css/components/forms.css" />
+    <link rel="stylesheet" href="~/css/components/glass-card.css" />
+    <link rel="stylesheet" href="~/css/components/modal.css" />
+    <link rel="stylesheet" href="~/css/components/sidebar.css" />
+    <link rel="stylesheet" href="~/css/components/stat-card.css" />
+    <link rel="stylesheet" href="~/css/components/table.css" />
+    <link rel="stylesheet" href="~/css/components/topbar.css" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.css" />
+    <style>
+        /* ── Dropdown Nav Groups ─────────────────────────────────────────────── */
+        .nav__group {
+            flex-shrink: 0;
+            margin-top: 6px;
+        }
+
+        /* زر رأس القسم */
+        .nav__group-toggle {
+            width: 100%;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 12px;
+            border-radius: 12px;
+            border: 1px solid transparent;
+            background: transparent;
+            color: var(--text);
+            cursor: pointer;
+            text-align: right;
+            font-size: 1rem;
+            font-family: inherit;
+            transition: background .15s, border-color .15s;
+            white-space: nowrap;
+        }
+
+            .nav__group-toggle:hover {
+                background: rgba(255,255,255,.04);
+                border-color: rgba(255,255,255,.05);
+            }
+
+            .nav__group-toggle.is-open {
+                background: rgba(79,140,255,.10);
+                border-color: rgba(79,140,255,.25);
+            }
+
+        .nav__group-label {
+            flex: 1;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .nav__group-arrow {
+            flex-shrink: 0;
+            font-size: .75rem;
+            color: var(--muted);
+            transition: transform .22s cubic-bezier(.4,0,.2,1);
+        }
+
+        .nav__group-toggle.is-open .nav__group-arrow {
+            transform: rotate(180deg);
+        }
+
+        /* حاوية العناصر — تنهار/تتسع بـ grid trick */
+        .nav__group-items {
+            display: grid;
+            grid-template-rows: 0fr;
+            transition: grid-template-rows .22s cubic-bezier(.4,0,.2,1);
+            padding-right: 10px;
+        }
+
+            .nav__group-items.is-open {
+                grid-template-rows: 1fr;
+            }
+
+        .nav__group-items-inner {
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+            padding-top: 4px;
+        }
+
+        /* عند انكماش السايد بار */
+        .sidebar--collapsed .nav__group-label,
+        .sidebar--collapsed .nav__group-arrow {
+            opacity: 0;
+            width: 0;
+            overflow: hidden;
+        }
+
+        .sidebar--collapsed .nav__group-toggle {
+            justify-content: center;
+            padding: 10px;
+        }
+
+        .sidebar--collapsed .nav__group-items {
+            padding-right: 0;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="app" id="appShell">
+
+        @{
+            var currentController = (ViewContext.RouteData.Values["controller"]?.ToString() ?? "").ToLowerInvariant();
+            var currentAction = (ViewContext.RouteData.Values["action"]?.ToString() ?? "").ToLowerInvariant();
+
+            string ActiveIf(string controller, string action = "index")
+            => (currentController == controller.ToLowerInvariant() &&
+            currentAction == action.ToLowerInvariant())
+            ? "nav__item nav__item--active" : "nav__item";
+
+            bool SectionHasActive(string[] controllers)
+            => controllers.Any(c => c.ToLowerInvariant() == currentController);
+
+            bool adminOpen = SectionHasActive(new[] { "drivers", "adminUsers", "areas", "trucks", "trucktypes" });
+            bool opsOpen = SectionHasActive(new[] { "reports" }) ||
+            (currentController == "home" && new[] { "pending", "hotspots" }.Contains(currentAction));
+            bool servicesOpen = SectionHasActive(new[] { "sewageserviceproviders", "awarenesscontents" });
+        }
+
+        <aside class="sidebar" id="sidebar" aria-label="القائمة الجانبية">
+
+            <div class="sidebar__brand">
+                <div class="brand">
+                    <span class="brand__logo" aria-hidden="true">CC</span>
+                    <div class="brand__text">
+                        <div class="brand__title">Clean City</div>
+                        <div class="brand__subtitle">وحدة التحكم</div>
+                    </div>
+                </div>
+                <button class="sidebar__toggle" id="btnCollapse" type="button"
+                        aria-label="طي القائمة" title="طي/توسيع القائمة">
+                    &#8250;
+                </button>
+            </div>
+
+            <nav class="nav" aria-label="التنقل">
+
+                <!-- ── الرئيسية ──────────────────────────────────────────────── -->
+                <a class="@ActiveIf("home", "index")" asp-controller="Home" asp-action="Index" title="الرئيسية">
+                    <span class="nav__icon">🏠</span>
+                    <span class="nav__label">الرئيسية</span>
+                </a>
+
+                <!-- ══════════════════════════════════════════════════════════════
+                     قسم الإدارة
+                ═══════════════════════════════════════════════════════════════ -->
+                <div class="nav__group">
+                    <button class="nav__group-toggle @(adminOpen ? "is-open" : "")"
+                            data-group="admin" type="button" title="الإدارة">
+                        <span class="nav__icon">⚙️</span>
+                        <span class="nav__group-label">الإدارة</span>
+                        <span class="nav__group-arrow">▼</span>
+                    </button>
+                    <div class="nav__group-items @(adminOpen ? "is-open" : "")">
+                        <div class="nav__group-items-inner">
+                            <a class="@ActiveIf("drivers", "create")"
+                               asp-controller="Drivers" asp-action="Create" title="إضافة سائق">
+                                <span class="nav__icon">➕</span>
+                                <span class="nav__label">إضافة سائق</span>
+                            </a>
+                            <a class="@ActiveIf("drivers", "index")"
+                               asp-controller="Drivers" asp-action="Index" title="عرض السائقين">
+                                <span class="nav__icon">👥</span>
+                                <span class="nav__label">عرض السائقين</span>
+                            </a>
+                            <a class="@ActiveIf("adminUsers", "createuserrequest")"
+                               asp-controller="AdminUsers" asp-action="CreateUserRequest" title="إضافة مستخدم">
+                                <span class="nav__icon">➕</span>
+                                <span class="nav__label">إضافة مستخدم</span>
+                            </a>
+                            <a class="@ActiveIf("adminUsers", "index")"
+                               asp-controller="AdminUsers" asp-action="Index" title="عرض المستخدمين">
+                                <span class="nav__icon">🧑‍💻</span>
+                                <span class="nav__label">عرض المستخدمين</span>
+                            </a>
+                            <a class="@ActiveIf("areas", "create")"
+                               asp-controller="Areas" asp-action="Create" title="إضافة منطقة">
+                                <span class="nav__icon">➕</span>
+                                <span class="nav__label">إضافة منطقة</span>
+                            </a>
+                            <a class="@ActiveIf("areas", "index")"
+                               asp-controller="Areas" asp-action="Index" title="عرض المناطق">
+                                <span class="nav__icon">🗺️</span>
+                                <span class="nav__label">عرض المناطق</span>
+                            </a>
+                            <a class="@ActiveIf("trucks", "create")"
+                               asp-controller="Trucks" asp-action="Create" title="إضافة شاحنة">
+                                <span class="nav__icon">➕</span>
+                                <span class="nav__label">إضافة شاحنة</span>
+                            </a>
+                            <a class="@ActiveIf("trucks", "index")"
+                               asp-controller="Trucks" asp-action="Index" title="عرض الشاحنات">
+                                <span class="nav__icon">🚚</span>
+                                <span class="nav__label">عرض الشاحنات</span>
+                            </a>
+                            <a class="@ActiveIf("trucktypes", "create")"
+                               asp-controller="TruckTypes" asp-action="Create" title="إضافة نوع شاحنة">
+                                <span class="nav__icon">➕</span>
+                                <span class="nav__label">إضافة نوع شاحنة</span>
+                            </a>
+                            <a class="@ActiveIf("trucktypes", "index")"
+                               asp-controller="TruckTypes" asp-action="Index" title="عرض انواع الشاحنات">
+                                <span class="nav__icon">🏷️</span>
+                                <span class="nav__label">عرض انواع الشاحنات</span>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ══════════════════════════════════════════════════════════════
+                     قسم التشغيل
+                ═══════════════════════════════════════════════════════════════ -->
+                <div class="nav__group">
+                    <button class="nav__group-toggle @(opsOpen ? "is-open" : "")"
+                            data-group="ops" type="button" title="التشغيل">
+                        <span class="nav__icon">🔧</span>
+                        <span class="nav__group-label">التشغيل</span>
+                        <span class="nav__group-arrow">▼</span>
+                    </button>
+                    <div class="nav__group-items @(opsOpen ? "is-open" : "")">
+                        <div class="nav__group-items-inner">
+                            <a class="@ActiveIf("reports", "index")"
+                               asp-controller="Reports" asp-action="Index" title="البلاغات">
+                                <span class="nav__icon">📋</span>
+                                <span class="nav__label">البلاغات</span>
+                            </a>
+                            <a class="@ActiveIf("home", "pending")"
+                               asp-controller="Home" asp-action="Pending" title="البلاغات العالقة">
+                                <span class="nav__icon">⏳</span>
+                                <span class="nav__label">البلاغات العالقة</span>
+                            </a>
+                            <a class="@ActiveIf("home", "hotspots")"
+                               asp-controller="Home" asp-action="Hotspots" title="أكثر المناطق بلاغاً">
+                                <span class="nav__icon">🔥</span>
+                                <span class="nav__label">أكثر المناطق بلاغاً</span>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ══════════════════════════════════════════════════════════════
+                     قسم الخدمات
+                ═══════════════════════════════════════════════════════════════ -->
+                <div class="nav__group">
+                    <button class="nav__group-toggle @(servicesOpen ? "is-open" : "")"
+                            data-group="services" type="button" title="الخدمات">
+                        <span class="nav__icon">🛠️</span>
+                        <span class="nav__group-label">الخدمات</span>
+                        <span class="nav__group-arrow">▼</span>
+                    </button>
+                    <div class="nav__group-items @(servicesOpen ? "is-open" : "")">
+                        <div class="nav__group-items-inner">
+                            <a class="@ActiveIf("sewageserviceproviders", "create")"
+                               asp-controller="SewageServiceProviders" asp-action="Create" title="إضافة شفاط مجاري">
+                                <span class="nav__icon">🚽</span>
+                                <span class="nav__label">إضافة شفاط مجاري</span>
+                            </a>
+                            <a class="@ActiveIf("sewageserviceproviders", "index")"
+                               asp-controller="SewageServiceProviders" asp-action="Index" title="شفاطات المجاري">
+                                <span class="nav__icon">📋</span>
+                                <span class="nav__label">شفاطات المجاري</span>
+                            </a>
+                            <a class="@ActiveIf("awarenesscontents", "create")"
+                               asp-controller="AwarenessContents" asp-action="Create" title="إضافة مقال توعوي">
+                                <span class="nav__icon">➕</span>
+                                <span class="nav__label">إضافة مقال توعوي</span>
+                            </a>
+                            <a class="@ActiveIf("awarenesscontents", "index")"
+                               asp-controller="AwarenessContents" asp-action="Index" title="المقالات التوعوية">
+                                <span class="nav__icon">📝</span>
+                                <span class="nav__label">المقالات التوعوية</span>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+            </nav>
+
+            @* <div class="sidebar__footer">
+                <div class="user-chip" id="userChip" title="مدير النظام" style="cursor:pointer;">
+                    <span class="user-chip__avatar">A</span>
+                    <div class="user-chip__info">
+                        <div class="user-chip__name">مدير النظام</div>
+                        <div class="user-chip__meta">Admin</div>
+                    </div>
+                </div>
+            </div> *@
+            <div class="sidebar__footer">
+                @* ✅ فورم تسجيل الخروج - POST حقيقي يحذف الـ Cookie *@
+                <form id="logoutForm"
+                      method="post"
+                      asp-controller="Login"
+                      asp-action="Logout"
+                      style="display:none;">
+                    @Html.AntiForgeryToken()
+                </form>
+
+                <div class="user-chip" id="userChip" title="مدير النظام" style="cursor:pointer;">
+                    <span class="user-chip__avatar">A</span>
+                    <div class="user-chip__info">
+                        <div class="user-chip__name">مدير النظام</div>
+                        <div class="user-chip__meta">Admin</div>
+                    </div>
+                </div>
+            </div>
+
+        </aside>
+
+        <main class="main" id="mainContent">
+            @RenderBody()
+        </main>
+
+    </div>
+
+    <!-- ── SignalR Client ──────────────────────────────────────────────────── -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/8.0.7/signalr.min.js"></script>
+    <script>
+        (function () {
+            const connection = new signalR.HubConnectionBuilder()
+                .withUrl("/hubs/dashboard")
+                .withAutomaticReconnect()
+                .build();
+
+            connection.on("Refresh", function () {
+                window.location.reload();
+            });
+
+            connection.start().catch(function (err) {
+                console.error("SignalR connection error:", err);
+            });
+
+            // ✅ إغلاق الاتصال عند مغادرة الصفحة بالطريقة الحديثة
+            window.addEventListener('pagehide', function () {
+                connection.stop();
+            });
+        })();
+    </script>
+
+    <script>
+        (function () {
+
+            // ── Sidebar collapse ─────────────────────────────────────────────
+            var KEY     = 'cc_sidebar_collapsed';
+            var sidebar = document.getElementById('sidebar');
+            var btn     = document.getElementById('btnCollapse');
+
+            function load()    { try { return localStorage.getItem(KEY); } catch(e) { return null; } }
+            function save(val) { try { localStorage.setItem(KEY, val);   } catch(e) {} }
+
+            if (sidebar && btn) {
+                if (load() === '1') sidebar.classList.add('sidebar--collapsed');
+                btn.addEventListener('click', function () {
+                    save(sidebar.classList.toggle('sidebar--collapsed') ? '1' : '0');
+                });
+            }
+
+            var mb = document.getElementById('btnMobileMenu');
+            if (mb) mb.addEventListener('click', function () { sidebar.classList.toggle('is-open'); });
+
+            // ── Dropdown groups ──────────────────────────────────────────────
+            document.querySelectorAll('.nav__group-toggle').forEach(function (toggleBtn) {
+                toggleBtn.addEventListener('click', function () {
+                    var isOpen = toggleBtn.classList.contains('is-open');
+                    var items  = toggleBtn.nextElementSibling;
+
+                    // أغلق كل الأقسام الأخرى
+                    document.querySelectorAll('.nav__group-toggle').forEach(function (other) {
+                        other.classList.remove('is-open');
+                        other.nextElementSibling.classList.remove('is-open');
+                    });
+
+                    // افتح أو أغلق القسم الحالي
+                    if (!isOpen) {
+                        toggleBtn.classList.add('is-open');
+                        items.classList.add('is-open');
+                    }
+                });
+            });
+
+            // ── تسجيل الخروج ────────────────────────────────────────────────
+            document.addEventListener('DOMContentLoaded', function () {
+                var userChip = document.getElementById('userChip');
+                if (userChip) {
+                    userChip.addEventListener('click', function () {
+                        if (confirm('هل تريد تسجيل الخروج؟')) {
+                            window.location.href = '/login/Index';
+                        }
+                    });
+                }
+            });
+
+        })();
+    </script>
+
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>
+

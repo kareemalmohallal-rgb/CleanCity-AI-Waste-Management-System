@@ -1,0 +1,224 @@
+﻿@model CleanCity.Domain.Entities.Area
+@{
+    ViewData["Title"] = "تعديل منطقة";
+}
+
+<style>
+    .map-wrap {
+        border-radius: 14px;
+        overflow: hidden;
+        border: 1px solid rgba(255,255,255,.08);
+        background: rgba(0,0,0,.12);
+        margin-top: 10px;
+    }
+
+    #map {
+        width: 100%;
+        height: 650px;
+    }
+
+    .coords-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+        margin-top: 10px;
+    }
+
+    .coord-pill {
+        padding: 10px 12px;
+        border-radius: 12px;
+        border: 1px solid rgba(255,255,255,.08);
+        background: rgba(255,255,255,.04);
+        font-size: 13px;
+        line-height: 1.7;
+    }
+
+        .coord-pill span {
+            float: left;
+            opacity: .95;
+            font-weight: 700;
+        }
+</style>
+
+<header class="topbar">
+    <button class="icon-btn topbar__menu" id="btnMobileMenu" type="button" aria-label="فتح القائمة">
+        <span class="icon" aria-hidden="true">≡</span>
+    </button>
+
+    <div class="topbar__title">
+        <h1 class="page-title">تعديل منطقة</h1>
+        <p class="page-subtitle">رسم المنطقة على الخريطة (Leaflet)</p>
+    </div>
+
+    <div class="topbar__actions">
+        <a class="btn btn--primary" asp-controller="Areas" asp-action="Edit" asp-route-id="@Model.Id">تحديث</a>
+    </div>
+</header>
+
+<section class="content" aria-live="polite">
+    <section class="panel">
+        <div class="panel__header">
+            <h2 class="panel__title">تعديل منطقة</h2>
+            <div class="panel__meta">عدّل المستطيل ثم احفظ</div>
+        </div>
+
+        <form id="areaForm"
+              style="padding:14px"
+              asp-controller="Areas"
+              asp-action="Edit"
+              asp-route-id="@Model.Id"
+              method="post">
+            @Html.AntiForgeryToken()
+
+            <input type="hidden" asp-for="Id" />
+
+            <p class="panel__meta" style="margin:0 0 10px">
+                التعليمات: يمكنك سحب/تغيير حجم المستطيل. سيتم تحديث الإحداثيات تلقائيًا.
+            </p>
+
+            <div class="filters" style="grid-template-columns:1fr 1fr; align-items:start">
+
+                <label class="field">
+                    <span class="field__label">اسم المنطقة</span>
+                    <input class="field__control" asp-for="Name" type="text" placeholder="مثال: شعوب" required />
+                    <span asp-validation-for="Name" class="text-danger"></span>
+                </label>
+
+                <!-- حقول مخفية للإرسال -->
+                <input type="hidden" id="minLatH" asp-for="MinLat" />
+                <input type="hidden" id="minLngH" asp-for="MinLng" />
+                <input type="hidden" id="maxLatH" asp-for="MaxLat" />
+                <input type="hidden" id="maxLngH" asp-for="MaxLng" />
+
+                <div class="filters__actions" style="align-self:end">
+                    <a class="btn" asp-controller="Areas" asp-action="Index">رجوع</a>
+                    <button class="btn btn--primary" id="btnSave" type="submit">حفظ التعديل</button>
+                </div>
+            </div>
+
+            <!-- عرض الإحداثيات -->
+            <div class="coords-grid">
+                <div class="coord-pill">الشمال (MaxLat): <span id="maxLat">-</span></div>
+                <div class="coord-pill">الشرق (MaxLng): <span id="maxLng">-</span></div>
+                <div class="coord-pill">الجنوب (MinLat): <span id="minLat">-</span></div>
+                <div class="coord-pill">الغرب (MinLng): <span id="minLng">-</span></div>
+            </div>
+
+            <div class="map-wrap">
+                <div id="map" aria-label="خريطة رسم المنطقة"></div>
+            </div>
+
+            @Html.ValidationSummary(true, "", new { @class = "text-danger", style = "margin-top:10px" })
+        </form>
+    </section>
+</section>
+
+@section Scripts {
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.js"></script>
+
+    <script>
+        // حدود محافظة صنعاء (مثل صفحة الإنشاء)
+        const SANA_A_GOV_BOUNDS = L.latLngBounds(
+          L.latLng(14.747906, 43.506874),
+          L.latLng(16.045959, 45.108608)
+        );
+
+        const map = L.map('map', {
+          center: [(@Model.MinLat + @Model.MaxLat) / 2.0, (@Model.MinLng + @Model.MaxLng) / 2.0],
+          zoom: 12,
+          minZoom: 9,
+          maxZoom: 19,
+          maxBounds: SANA_A_GOV_BOUNDS,
+          maxBoundsViscosity: 1.0,
+          worldCopyJump: true,
+          zoomControl: true
+        });
+
+        const esri = L.tileLayer(
+          'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
+          { maxZoom: 19, attribution: 'Tiles &copy; Esri' }
+        ).addTo(map);
+
+        const drawnItems = new L.FeatureGroup();
+        map.addLayer(drawnItems);
+
+        const drawControl = new L.Control.Draw({
+          position: 'topleft',
+          draw: {
+            polyline: false, circle: false, marker: false, circlemarker: false, polygon: false,
+            rectangle: { shapeOptions: { color: '#28a745', weight: 2 } }
+          },
+          edit: { featureGroup: drawnItems, remove: true }
+        });
+        map.addControl(drawControl);
+
+        const el = (id) => document.getElementById(id);
+
+        function setCoordsFromBounds(bounds) {
+          const sw = bounds.getSouthWest();
+          const ne = bounds.getNorthEast();
+
+          const minLat = +sw.lat.toFixed(6);
+          const minLng = +sw.lng.toFixed(6);
+          const maxLat = +ne.lat.toFixed(6);
+          const maxLng = +ne.lng.toFixed(6);
+
+          el('minLat').innerText = minLat.toFixed(6);
+          el('minLng').innerText = minLng.toFixed(6);
+          el('maxLat').innerText = maxLat.toFixed(6);
+          el('maxLng').innerText = maxLng.toFixed(6);
+
+          el('minLatH').value = minLat;
+          el('minLngH').value = minLng;
+          el('maxLatH').value = maxLat;
+          el('maxLngH').value = maxLng;
+        }
+
+        // ✅ رسم المستطيل الحالي من بيانات Model
+        const initialBounds = L.latLngBounds(
+          L.latLng(@Model.MinLat.ToString(System.Globalization.CultureInfo.InvariantCulture),
+                   @Model.MinLng.ToString(System.Globalization.CultureInfo.InvariantCulture)),
+          L.latLng(@Model.MaxLat.ToString(System.Globalization.CultureInfo.InvariantCulture),
+                   @Model.MaxLng.ToString(System.Globalization.CultureInfo.InvariantCulture))
+        );
+
+        const rect = L.rectangle(initialBounds, { color: '#28a745', weight: 2 });
+        drawnItems.addLayer(rect);
+
+        map.fitBounds(initialBounds, { padding: [20,20] });
+        setCoordsFromBounds(rect.getBounds());
+
+        // عند إنشاء مستطيل جديد: نمسح القديم ونضع الجديد
+        map.on(L.Draw.Event.CREATED, function (e) {
+          const layer = e.layer;
+
+          if (!SANA_A_GOV_BOUNDS.contains(layer.getBounds())) return;
+
+          drawnItems.clearLayers();
+          drawnItems.addLayer(layer);
+          setCoordsFromBounds(layer.getBounds());
+        });
+
+        // عند تعديل: حدّث الإحداثيات
+        map.on(L.Draw.Event.EDITED, function (e) {
+          e.layers.eachLayer(function (layer) {
+            if (!SANA_A_GOV_BOUNDS.contains(layer.getBounds())) return;
+            setCoordsFromBounds(layer.getBounds());
+          });
+        });
+
+        // عند حذف: صفّر الإحداثيات
+        map.on(L.Draw.Event.DELETED, function () {
+          el('minLat').innerText = '-';
+          el('minLng').innerText = '-';
+          el('maxLat').innerText = '-';
+          el('maxLng').innerText = '-';
+
+          el('minLatH').value = '';
+          el('minLngH').value = '';
+          el('maxLatH').value = '';
+          el('maxLngH').value = '';
+        });
+    </script>
+}

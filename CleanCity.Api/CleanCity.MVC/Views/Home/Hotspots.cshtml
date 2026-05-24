@@ -1,0 +1,64 @@
+﻿@model IEnumerable<CleanCity.MVC.Models.HotspotAreaVm>
+@{
+    ViewData["Title"] = "أكثر المناطق بلاغاً";
+}
+
+<header class="topbar">
+    <button class="icon-btn topbar__menu" id="btnMobileMenu" type="button" aria-label="فتح القائمة">
+        <span class="icon" aria-hidden="true">≡</span>
+    </button>
+
+    <div class="topbar__title">
+        <h1 class="page-title">أكثر المناطق بلاغاً</h1>
+        <p class="page-subtitle">إحصاءات المناطق (آخر 24 ساعة)</p>
+    </div>
+
+    <div class="topbar__actions">
+        <a class="btn btn--primary" asp-controller="Areas" asp-action="Hotspots" aria-label="تحديث الصفحة">تحديث</a>
+    </div>
+</header>
+
+<section class="content" aria-live="polite">
+    <section class="panel">
+        <div class="panel__header">
+            <h2 class="panel__title">أكثر المناطق بلاغاً</h2>
+            <div class="panel__meta">@((Model?.Count() ?? 0)) مناطق</div>
+        </div>
+
+        <div class="table-wrap">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>المنطقة</th>
+                        <th>عدد البلاغات</th>
+                        <th>عرض</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model != null && Model.Any())
+                    {
+                        foreach (var x in Model)
+                        {
+                            <tr>
+                                <td>@x.AreaName</td>
+                                <td>@x.ReportsCount</td>
+                                <td>
+                                    <a class="btn btn--sm"
+                                       asp-controller="Areas"
+                                       asp-action="Details"
+                                       asp-route-id="@x.AreaId">عرض</a>
+                                </td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="3" style="text-align:center; opacity:.8;">لا توجد بلاغات خلال آخر 24 ساعة.</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </section>
+</section>

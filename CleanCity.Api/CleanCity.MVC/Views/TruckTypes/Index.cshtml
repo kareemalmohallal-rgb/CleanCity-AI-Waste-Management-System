@@ -1,0 +1,70 @@
+﻿@model IEnumerable<CleanCity.Domain.Entities.TruckType>
+
+<header class="topbar">
+    <button class="icon-btn topbar__menu" id="btnMobileMenu" type="button" aria-label="فتح القائمة">
+        <span class="icon" aria-hidden="true">≡</span>
+    </button>
+    <div class="topbar__title">
+        <h1 class="page-title">أنواع الشاحنات</h1>
+        <p class="page-subtitle">قائمة أنواع الشاحنات</p>
+    </div>
+    <div class="topbar__actions">
+        <a class="btn btn--primary" asp-controller="TruckTypes" asp-action="Index" aria-label="تحديث الصفحة">تحديث</a>
+    </div>
+</header>
+
+<section class="content" aria-live="polite">
+    <section class="panel">
+        <div class="panel__header">
+            <h2 class="panel__title">أنواع الشاحنات</h2>
+            <div class="panel__meta">@((Model?.Count() ?? 0)) سجلات</div>
+        </div>
+
+        <div class="table-wrap">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>الكود</th>
+                        <th>الاسم</th>
+                        <th>إجراءات</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model != null && Model.Any())
+                    {
+                        foreach (var t in Model)
+                        {
+                            <tr>
+                                <td>TYP-@t.Id.ToString("D2")</td>
+                                <td>@t.Name</td>
+                                <td>
+                                    <div class="row-actions">
+                                        <a class="btn btn--sm btn--primary"
+                                           asp-controller="TruckTypes"
+                                           asp-action="Edit"
+                                           asp-route-id="@t.Id">تعديل</a>
+
+                                        <a class="btn btn--sm btn--danger"
+                                           asp-controller="TruckTypes"
+                                           asp-action="Delete"
+                                           asp-route-id="@t.Id">حذف</a>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="3" style="text-align:center; opacity:.8;">لا توجد أنواع شاحنات.</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        <div class="panel__footer">
+            <a class="btn btn--primary" asp-controller="TruckTypes" asp-action="Create">إضافة نوع</a>
+        </div>
+    </section>
+</section>

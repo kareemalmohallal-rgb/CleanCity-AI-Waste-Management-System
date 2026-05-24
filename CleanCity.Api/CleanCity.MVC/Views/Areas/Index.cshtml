@@ -1,0 +1,97 @@
+﻿@model IEnumerable<CleanCity.Application.DTOs.AreaListItem.AreaListItemDto>
+
+    <header class="topbar">
+        <button class="icon-btn topbar__menu" id="btnMobileMenu" type="button" aria-label="فتح القائمة">
+            <span class="icon" aria-hidden="true">≡</span>
+        </button>
+
+        <div class="topbar__title">
+            <h1 class="page-title">عرض المناطق</h1>
+            <p class="page-subtitle">قائمة المناطق (Static)</p>
+        </div>
+
+        <div class="topbar__actions">
+           
+
+            <a class="btn btn--primary" href="" aria-label="تحديث الصفحة">تحديث</a>
+        </div>
+    </header>
+
+    <section class="content" aria-live="polite">
+        <section class="panel">
+            <div class="panel__header">
+                <h2 class="panel__title">المناطق</h2>
+                <div class="panel__meta">3 سجلات</div>
+            </div>
+
+            <div class="table-wrap">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>اسم المنطقة</th>
+                            <th>المدينة/الحي</th>
+                            <th>عدد البلاغات</th>
+                            <th>المسؤول</th>
+                            <th>إجراءات</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (Model != null && Model.Any())
+                        {
+                            foreach (var a in Model)
+                            {
+                                <tr>
+                                    <td>@a.Name</td>
+
+                                    <!-- بما أن Area عندك لا يحتوي City/حي، خلّينا نعرضها ثابتة أو اتركها فارغة -->
+                                    <td>صنعاء</td>
+
+                                    <!-- Area عندك لا يحتوي Reports count إلا إذا Include; عرض 0 كافتراضي -->
+                                    <td>@(a.ReportsCount)</td>
+
+                                    <!-- المسؤول: غير موجود مباشرة في Area عندك (Drivers collection) -->
+                                    <td>
+                                        @(a.ResponsibleDriverName ?? "—")
+                            </td>
+
+                                    <td>
+                                        <div class="row-actions">
+                                            <a class="btn btn--sm"
+                                               asp-controller="Areas"
+                                               asp-action="Details"
+                                               asp-route-id="@a.Id">تفاصيل</a>
+
+                                            <a class="btn btn--sm btn--primary"
+                                               asp-controller="Areas"
+                                               asp-action="Edit"
+                                               asp-route-id="@a.Id">تعديل</a>
+
+                                            <!-- حذف: الأفضل عبر POST -->
+                                            <form asp-controller="Areas"
+                                                  asp-action="Delete"
+                                                  asp-route-id="@a.Id"
+                                                  method="post"
+                                                  style="display:inline">
+                                                @Html.AntiForgeryToken()
+                                                <button class="btn btn--sm btn--danger" type="submit">حذف</button>
+                                            </form>
+                                        </div>
+                                    </td>
+                                </tr>
+                                                }
+                        }
+                        else
+                        {
+                            <tr>
+                                <td colspan="5" style="text-align:center; opacity:.8;">لا توجد مناطق.</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="panel__footer">
+            <a class="btn btn--primary" asp-controller="Areas" asp-action="Create">إضافة منطقة</a>
+            </div>
+        </section>
+    </section>

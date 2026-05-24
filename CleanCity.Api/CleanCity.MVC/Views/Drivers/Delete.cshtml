@@ -1,0 +1,72 @@
+﻿@model CleanCity.Domain.Entities.Driver
+
+<header class="topbar">
+    <button class="icon-btn topbar__menu" id="btnMobileMenu" type="button" aria-label="فتح القائمة">
+        <span class="icon" aria-hidden="true">≡</span>
+    </button>
+
+    <div class="topbar__title">
+        <h1 class="page-title">حذف سائق</h1>
+        <p class="page-subtitle">تأكيد الحذف</p>
+    </div>
+
+    <div class="topbar__actions">
+        <a class="btn" asp-controller="Drivers" asp-action="Index">رجوع</a>
+    </div>
+</header>
+
+<section class="content" aria-live="polite">
+    <section class="panel">
+        <div class="panel__header">
+            <h2 class="panel__title">تأكيد حذف السائق</h2>
+            <div class="panel__meta">DRV-@Model.Id.ToString("D2")</div>
+        </div>
+
+        @if (!ViewData.ModelState.IsValid)
+        {
+            <div style="margin:16px; padding:12px 16px; background:rgba(220,53,69,.12); border:1px solid rgba(220,53,69,.4); border-radius:8px; color:#dc3545;">
+                @Html.ValidationSummary(false, "", new { @class = "text-danger", style = "margin:0; padding:0; list-style:none;" })
+            </div>
+        }
+
+        <div style="padding:16px; display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+
+            <div class="field">
+                <span class="field__label">اسم السائق</span>
+                <span class="field__control" style="display:block; background:var(--surface-1, #1e2a35); color:var(--text, #e0e0e0); padding:8px 12px; border-radius:6px; border:1px solid var(--border, #2e3d4a);">@Model.FullName</span>
+            </div>
+
+            <div class="field">
+                <span class="field__label">رقم الهاتف</span>
+                <span class="field__control" style="display:block; background:var(--surface-1, #1e2a35); color:var(--text, #e0e0e0); padding:8px 12px; border-radius:6px; border:1px solid var(--border, #2e3d4a);">@Model.PhoneNumber</span>
+            </div>
+
+            <div class="field">
+                <span class="field__label">رقم الرخصة</span>
+                <span class="field__control" style="display:block; background:var(--surface-1, #1e2a35); color:var(--text, #e0e0e0); padding:8px 12px; border-radius:6px; border:1px solid var(--border, #2e3d4a);">@(Model.LicenseNumber ?? "—")</span>
+            </div>
+
+            <div class="field">
+                <span class="field__label">المنطقة</span>
+                <span class="field__control" style="display:block; background:var(--surface-1, #1e2a35); color:var(--text, #e0e0e0); padding:8px 12px; border-radius:6px; border:1px solid var(--border, #2e3d4a);">@(Model.Area?.Name ?? "—")</span>
+            </div>
+
+            <div class="field">
+                <span class="field__label">الحالة</span>
+                <span class="field__control" style="display:block; background:var(--surface-1, #1e2a35); color:var(--text, #e0e0e0); padding:8px 12px; border-radius:6px; border:1px solid var(--border, #2e3d4a);">
+                    @(Model.IsActive ? "نشط" : "غير نشط")
+                </span>
+            </div>
+
+        </div>
+
+        <div class="panel__footer" style="display:flex; gap:10px;">
+            <form asp-controller="Drivers" asp-action="Delete" asp-route-id="@Model.Id" method="post">
+                @Html.AntiForgeryToken()
+                <button class="btn btn--danger" type="submit">تأكيد الحذف</button>
+            </form>
+            <a class="btn" asp-controller="Drivers" asp-action="Index">إلغاء</a>
+        </div>
+
+    </section>
+</section>

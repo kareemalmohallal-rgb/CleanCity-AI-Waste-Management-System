@@ -1,0 +1,122 @@
+﻿@model CleanCity.MVC.Models.AwarenessContentViewModel
+
+<header class="topbar">
+    <button class="icon-btn topbar__menu" id="btnMobileMenu" type="button" aria-label="فتح القائمة">
+        <span class="icon" aria-hidden="true">≡</span>
+    </button>
+    <div class="topbar__title">
+        <h1 class="page-title">المقالات التوعوية</h1>
+        <p class="page-subtitle">كتابة ونشر مقال جديد</p>
+    </div>
+    <div class="topbar__actions">
+        <a class="btn" asp-controller="AwarenessContents" asp-action="Index">رجوع</a>
+    </div>
+</header>
+
+<section class="content" aria-live="polite">
+    <section class="panel">
+        <div class="panel__header">
+            <h2 class="panel__title">مقال توعوي جديد</h2>
+            <div class="panel__meta">نموذج كتابة</div>
+        </div>
+
+        <form style="padding:14px"
+              asp-controller="AwarenessContents"
+              asp-action="Create"
+              method="post"
+              enctype="multipart/form-data">
+            @Html.AntiForgeryToken()
+
+            <p class="panel__meta" style="margin:0 0 10px">
+                أدخل بيانات المقال ثم اضغط نشر.
+            </p>
+
+            <div class="filters" style="grid-template-columns:1fr; align-items:start">
+
+                <!-- ───── العنوان ───── -->
+                <label class="field">
+                    <span class="field__label">العنوان</span>
+                    <input class="field__control"
+                           asp-for="Title"
+                           type="text"
+                           placeholder="اكتب عنواناً واضحاً للمقال" />
+                    <span asp-validation-for="Title" class="text-danger"></span>
+                </label>
+
+                <!-- ───── محتوى المقال ───── -->
+                <label class="field">
+                    <span class="field__label">محتوى المقال</span>
+                    <textarea class="field__control"
+                              asp-for="Content"
+                              rows="10"
+                              placeholder="اكتب محتوى المقال التوعوي هنا..."></textarea>
+                    <span asp-validation-for="Content" class="text-danger"></span>
+                </label>
+
+                <!-- ───── صورة المقال (اختيارية) ───── -->
+                <label class="field">
+                    <span class="field__label">صورة المقال <small style="opacity:.7">(اختياري)</small></span>
+                    <input class="field__control"
+                           asp-for="ImageFile"
+                           type="file"
+                           accept="image/*"
+                           onchange="previewImage(this)" />
+                </label>
+
+                <!-- معاينة الصورة قبل الرفع -->
+                <div id="imagePreview"
+                     style="display:none; margin-top:10px; text-align:center;">
+                    <img id="previewImg"
+                         src="#"
+                         alt="معاينة الصورة"
+                         style="max-width:100%;
+                                max-height:300px;
+                                border-radius:10px;
+                                border:2px solid rgba(0,0,0,.1);
+                                box-shadow:0 2px 8px rgba(0,0,0,.1);" />
+                    <br />
+                    <button type="button"
+                            class="btn btn--sm"
+                            style="margin-top:8px"
+                            onclick="clearImage()">
+                        إزالة الصورة
+                    </button>
+                </div>
+
+            </div>
+
+            <div style="display:flex; gap:10px; margin-top:14px; flex-wrap:wrap">
+                <button type="submit" class="btn btn--primary">نشر المقال</button>
+                <a class="btn" asp-controller="AwarenessContents" asp-action="Create">تفريغ</a>
+            </div>
+
+            <div style="margin-top:10px">
+                @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+            </div>
+        </form>
+    </section>
+</section>
+
+<!-- سكربت معاينة الصورة -->
+<script>
+    function previewImage(input) {
+        var preview = document.getElementById('imagePreview');
+        var img = document.getElementById('previewImg');
+
+        if (input.files && input.files[0]) {
+            var reader = new FileReader();
+            reader.onload = function (e) {
+                img.src = e.target.result;
+                preview.style.display = 'block';
+            };
+            reader.readAsDataURL(input.files[0]);
+        }
+    }
+
+    function clearImage() {
+        var input = document.querySelector('input[type="file"]');
+        input.value = '';
+        document.getElementById('imagePreview').style.display = 'none';
+        document.getElementById('previewImg').src = '#';
+    }
+</script>

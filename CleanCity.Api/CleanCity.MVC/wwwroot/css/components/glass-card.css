@@ -1,0 +1,30 @@
+.card{
+  background: rgba(255,255,255,.03);
+  border: 1px solid rgba(255,255,255,.06);
+  border-radius: var(--radius);
+  padding:14px;
+  box-shadow: var(--shadow);
+}
+.card__header{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+}
+.card__title{
+  margin:0;
+  font-size:1rem;
+  color: var(--muted);
+  font-weight:600;
+}
+.card__value{
+  margin-top:10px;
+  font-size:2rem;
+  font-weight:800;
+}
+.card__hint{
+  margin-top:6px;
+  color: var(--muted);
+  font-size:.92rem;
+}
+.unit{ color: var(--muted); font-size:1rem; margin-inline-start:6px; }

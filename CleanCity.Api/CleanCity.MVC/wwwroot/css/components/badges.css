@@ -1,0 +1,16 @@
+.badge{
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+  padding:6px 10px;
+  border-radius: 999px;
+  font-size:.9rem;
+  border: 1px solid rgba(255,255,255,.12);
+  background: rgba(255,255,255,.04);
+  color: var(--text);
+}
+.badge--success{ border-color: rgba(46,204,113,.35); background: rgba(46,204,113,.12); }
+.badge--warn{ border-color: rgba(241,196,15,.35); background: rgba(241,196,15,.12); }
+.badge--info{ border-color: rgba(79,140,255,.35); background: rgba(79,140,255,.12); }
+.badge--neutral{ border-color: rgba(255,255,255,.18); background: rgba(255,255,255,.06); }
+.badge--danger{ border-color: rgba(255,92,122,.35); background: rgba(255,92,122,.12); }

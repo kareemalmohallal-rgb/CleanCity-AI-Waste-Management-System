@@ -1,0 +1,45 @@
+﻿@model CleanCity.MVC.Models.ReassignReportVm
+@{
+    ViewData["Title"] = "إسناد بلاغ";
+}
+
+<header class="topbar">
+    <div class="topbar__title">
+        <h1 class="page-title">إسناد بلاغ لسائق آخر</h1>
+        <p class="page-subtitle">البلاغ #@Model.ReportId — المنطقة: @Model.AreaName</p>
+    </div>
+    <div class="topbar__actions">
+        <a class="btn" asp-controller="Home" asp-action="Pending">رجوع</a>
+    </div>
+</header>
+
+<section class="content">
+    <section class="panel">
+        <div class="panel__header">
+            <h2 class="panel__title">اختيار سائق من نفس المنطقة</h2>
+        </div>
+
+        <form asp-controller="Home" asp-action="Reassign" method="post" style="padding:14px">
+            @Html.AntiForgeryToken()
+
+            <input type="hidden" asp-for="ReportId" />
+            <input type="hidden" asp-for="AreaId" />
+            <input type="hidden" asp-for="AreaName" />
+
+            <label class="field" style="max-width:420px">
+                <span class="field__label">السائق</span>
+                <select class="field__control" asp-for="SelectedDriverId" asp-items="Model.Drivers">
+                    <option value="">اختر سائقًا…</option>
+                </select>
+                <span asp-validation-for="SelectedDriverId" class="text-danger"></span>
+            </label>
+
+            <div style="display:flex; gap:10px; margin-top:12px">
+                <button class="btn btn--primary" type="submit">إسناد</button>
+                <a class="btn" asp-controller="Home" asp-action="Pending">إلغاء</a>
+            </div>
+
+            @Html.ValidationSummary(true, "", new { @class = "text-danger", style = "margin-top:10px" })
+        </form>
+    </section>
+</section>

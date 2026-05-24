@@ -1,0 +1,106 @@
+﻿@model CleanCity.Domain.Entities.SewageServiceProvider
+
+    <header class="topbar">
+        <button class="icon-btn topbar__menu" id="btnMobileMenu" type="button" aria-label="فتح القائمة">
+            <span class="icon" aria-hidden="true">≡</span>
+        </button>
+
+        <div class="topbar__title">
+            <h1 class="page-title">شفاطات المجاري</h1>
+            <p class="page-subtitle">نموذج ثابت لإدخال بيانات شفاطات المجاري (بدون حفظ فعلي)</p>
+        </div>
+
+        <div class="topbar__actions">
+            <div class="pill">
+                <span class="pill__label">الوقت:</span>
+                <span class="pill__value">—</span>
+            </div>
+
+            <a class="btn btn--primary" href="" aria-label="تحديث الصفحة">تحديث</a>
+        </div>
+    </header>
+
+    <section class="content" aria-live="polite">
+        <section class="panel">
+            <div class="panel__header">
+                <h2 class="panel__title">إضافة شفاط مجاري</h2>
+                <div class="panel__meta">بيانات السائق والتسعير والسعة</div>
+            </div>
+
+            <form style="padding:14px"
+                  asp-controller="SewageServiceProviders"
+                  asp-action="Create"
+                  method="post">
+                @Html.AntiForgeryToken()
+
+                <p class="panel__meta" style="margin:0 0 10px">
+                    أدخل بيانات مزود خدمة الشفط ثم اضغط حفظ.
+                </p>
+
+                <div class="filters" style="grid-template-columns:1fr 1fr; align-items:start">
+
+                    <!-- اسم السائق -->
+                    <label class="field">
+                        <span class="field__label">اسم السائق</span>
+                        <input class="field__control"
+                               asp-for="OwnerName"
+                               type="text"
+                               placeholder="مثال: محمد أحمد" />
+                        <span asp-validation-for="OwnerName" class="text-danger"></span>
+                    </label>
+
+                    <!-- رقم الهاتف -->
+                    <label class="field">
+                        <span class="field__label">رقم الهاتف</span>
+                        <input class="field__control"
+                               asp-for="PhoneNumber"
+                               type="tel"
+                               placeholder="مثال: 777123456" />
+                        <span asp-validation-for="PhoneNumber" class="text-danger"></span>
+                    </label>
+
+                    <!-- سعر الشفط -->
+                    <label class="field">
+                        <span class="field__label">سعر الشفط</span>
+                        <input class="field__control"
+                               asp-for="Price"
+                               type="number"
+                               min="0"
+                               step="0.01"
+                               placeholder="مثال: 25000" />
+                        <span asp-validation-for="Price" class="text-danger"></span>
+                    </label>
+
+                    <!-- سعة الشفاط باللتر -->
+                    <label class="field">
+                        <span class="field__label">سعة الشفاط (لتر)</span>
+                        <input class="field__control"
+                               asp-for="Size"
+                               type="number"
+                               min="0"
+                               step="1"
+                               placeholder="مثال: 6000" />
+                        <span asp-validation-for="Size" class="text-danger"></span>
+                    </label>
+
+                    <div class="filters__actions" style="align-self:end">
+                        <!-- مسح: يعيد تحميل صفحة Create (تفريغ الحقول) -->
+                        <a class="btn"
+                           asp-controller="SewageServiceProviders"
+                           asp-action="Create">
+                            مسح
+                        </a>
+
+                        <!-- حفظ: Submit طبيعي لـ ASP.NET Core -->
+                        <button class="btn btn--primary" type="submit">حفظ</button>
+                    </div>
+
+                </div>
+
+                <!-- عرض أخطاء عامة -->
+                <div style="margin-top:10px">
+                    @Html.ValidationSummary(excludePropertyErrors: true, message: "", htmlAttributes: new { @class = "text-danger" })
+                </div>
+            </form>
+        </section>
+    </section>

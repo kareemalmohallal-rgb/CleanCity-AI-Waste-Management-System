@@ -1,0 +1,65 @@
+﻿@model CleanCity.MVC.Models.ReassignReportVm
+@{
+    ViewData["Title"] = $"إسناد البلاغ #{Model.ReportId}";
+}
+
+<header class="topbar">
+    <div class="topbar__title">
+        <h1 class="page-title">إسناد البلاغ</h1>
+        <p class="page-subtitle">#@Model.ReportId — منطقة: @Model.AreaName</p>
+    </div>
+    <div class="topbar__actions">
+        <a class="btn"
+           asp-controller="Reports"
+           asp-action="Details"
+           asp-route-id="@Model.ReportId">رجوع</a>
+    </div>
+</header>
+
+<section class="content">
+    <section class="panel" style="max-width:520px">
+        <div class="panel__header">
+            <h2 class="panel__title">اختر السائق</h2>
+        </div>
+
+        <form method="post"
+              asp-controller="Reports"
+              asp-action="Reassign"
+              style="padding:16px;display:flex;flex-direction:column;gap:14px">
+
+            @Html.AntiForgeryToken()
+            <input type="hidden" asp-for="ReportId" />
+            <input type="hidden" asp-for="AreaId" />
+            <input type="hidden" asp-for="AreaName" />
+
+            <label class="field">
+                <span class="field__label">السائق المتاح في منطقة @Model.AreaName</span>
+                <select asp-for="SelectedDriverId"
+                        asp-items="Model.Drivers"
+                        class="field__control">
+                    <option value="">— اختر سائقاً —</option>
+                </select>
+                <span asp-validation-for="SelectedDriverId" class="field__error"></span>
+            </label>
+
+            @if (!ViewData.ModelState.IsValid)
+            {
+                <div asp-validation-summary="All" class="field__error"></div>
+            }
+
+            <div style="display:flex;gap:8px">
+                <button type="submit" class="btn btn--primary">تأكيد الإسناد</button>
+                <a class="btn"
+                   asp-controller="Reports"
+                   asp-action="Details"
+                   asp-route-id="@Model.ReportId">إلغاء</a>
+            </div>
+        </form>
+    </section>
+</section>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

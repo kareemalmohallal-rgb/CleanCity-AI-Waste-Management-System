@@ -1,0 +1,60 @@
+﻿@model CleanCity.MVC.Models.ReportDetailsVm
+@{
+    ViewData["Title"] = "تفاصيل البلاغ";
+}
+
+<header class="topbar">
+    <div class="topbar__title">
+        <h1 class="page-title">تفاصيل البلاغ</h1>
+        <p class="page-subtitle">#@Model.ReportId</p>
+    </div>
+    <div class="topbar__actions">
+        <a class="btn" asp-controller="Reports" asp-action="Pending">رجوع</a>
+    </div>
+</header>
+
+<section class="content">
+    <section class="panel">
+        <div class="panel__header">
+            <h2 class="panel__title">بيانات البلاغ</h2>
+        </div>
+
+        <div style="padding:14px" class="kv">
+            <div class="kv__k">المنطقة</div><div class="kv__v">@Model.AreaName</div>
+            <div class="kv__k">الوصف</div><div class="kv__v">@Model.Description</div>
+            <div class="kv__k">الحالة</div><div class="kv__v">@Model.Status</div>
+            <div class="kv__k">السائق الحالي</div><div class="kv__v">@((Model.CurrentDriverName ?? "—"))</div>
+            <div class="kv__k">سبب الرفض من السائق</div><div class="kv__v">@Model.RejectionReason</div>
+            <div class="kv__k">سبب الرفض من الذكاء الاصطناعي</div><div class="kv__v">@Model.AiReason</div>
+            <div class="kv__k">وقت الإنشاء</div><div class="kv__v">@Model.CreatedAt.ToString("yyyy-MM-dd HH:mm")</div>
+            <div class="kv__k">الصوره</div>
+            <div class="kv__v">
+                @if (!string.IsNullOrWhiteSpace(Model.ImageUrl))
+                {
+                    <img src="@($"http://192.168.8.158:5127{Model.ImageUrl}")" alt="صورة البلاغ" style="max-width:250px;height:auto;border:1px solid #ccc;border-radius:8px;" />
+                }
+                else
+                {
+                    <span>لا توجد صورة</span>
+                }
+            </div>
+        </div>
+    </section>
+
+    <section class="panel" style="margin-top:16px">
+        <div class="panel__header">
+            <h2 class="panel__title">آخر رفض</h2>
+        </div>
+
+        <div style="padding:14px" class="kv">
+            <div class="kv__k">السائق الذي رفض</div><div class="kv__v">@((Model.RejectedByDriverName ?? "—"))</div>
+            <div class="kv__k">سبب الرفض</div><div class="kv__v">@((Model.RejectionReason ?? "—"))</div>
+            <div class="kv__k">وقت الرفض</div><div class="kv__v">@((Model.RejectedAt?.ToString("yyyy-MM-dd HH:mm") ?? "—"))</div>
+        </div>
+
+        <div class="panel__footer">
+            <a class="btn btn--primary" asp-controller="Home" asp-action="Reassign" asp-route-id="@Model.ReportId">إسناد لسائق آخر</a>
+            <a class="btn btn--primary" asp-controller="Home" asp-action="Reassign" asp-route-id="@Model.ReportId">تجاهل</a>
+        </div>
+    </section>
+</section>

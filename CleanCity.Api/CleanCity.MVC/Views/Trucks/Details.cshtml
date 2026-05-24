@@ -1,0 +1,90 @@
+﻿@model CleanCity.Domain.Entities.Truck
+@{
+    ViewData["Title"] = "تفاصيل الشاحنة";
+}
+
+<header class="topbar">
+    <button class="icon-btn topbar__menu" id="btnMobileMenu" type="button" aria-label="فتح القائمة">
+        <span class="icon" aria-hidden="true">≡</span>
+    </button>
+
+    <div class="topbar__title">
+        <h1 class="page-title">تفاصيل الشاحنة</h1>
+        <p class="page-subtitle">TRK-@Model.Id.ToString("D2")</p>
+    </div>
+
+    <div class="topbar__actions">
+        <a class="btn" asp-controller="Trucks" asp-action="Index">رجوع</a>
+        <a class="btn btn--primary"
+           asp-controller="Trucks"
+           asp-action="Edit"
+           asp-route-id="@Model.Id">تعديل</a>
+    </div>
+</header>
+
+<section class="content" aria-live="polite">
+    <section class="panel">
+        <div class="panel__header">
+            <h2 class="panel__title">بيانات الشاحنة</h2>
+            <div class="panel__meta">ID: @Model.Id</div>
+        </div>
+
+        <div style="padding:14px">
+            <div class="kv">
+                <div class="kv__k">الكود</div>
+                <div class="kv__v">TRK-@Model.Id.ToString("D2")</div>
+
+                <div class="kv__k">الاسم</div>
+                <div class="kv__v">@(!string.IsNullOrWhiteSpace(Model.Name) ? Model.Name : "—")</div>
+
+                <div class="kv__k">الرقم</div>
+                <div class="kv__v">@(!string.IsNullOrWhiteSpace(Model.Number) ? Model.Number : "—")</div>
+
+                <div class="kv__k">الحجم</div>
+                <div class="kv__v">@(!string.IsNullOrWhiteSpace(Model.Size) ? Model.Size : "—")</div>
+
+                <div class="kv__k">الحالة</div>
+                <div class="kv__v">
+                    @if (Model.IsActive)
+                    {
+                        <span class="badge badge--success">متاحة</span>
+                    }
+                    else
+                    {
+                        <span class="badge badge--warn">غير متاحة</span>
+                    }
+                </div>
+
+                <div class="kv__k">نوع الشاحنة</div>
+                <div class="kv__v">
+                    @(Model.TruckType != null ? Model.TruckType.Name : (Model.TruckTypeId.HasValue ? $"#{Model.TruckTypeId}" : "—"))
+                </div>
+
+                <div class="kv__k">السائق</div>
+                <div class="kv__v">
+                    @(Model.Driver != null ? Model.Driver.FullName : (Model.DriverId.HasValue ? $"#{Model.DriverId}" : "—"))
+                </div>
+            </div>
+
+            <div class="panel__footer" style="padding:12px 0 0;border-top:0; display:flex; gap:10px; flex-wrap:wrap;">
+                <a class="btn"
+                   asp-controller="Trucks"
+                   asp-action="Index">رجوع للقائمة</a>
+
+                <a class="btn btn--primary"
+                   asp-controller="Trucks"
+                   asp-action="Edit"
+                   asp-route-id="@Model.Id">تعديل الشاحنة</a>
+
+                <form asp-controller="Trucks"
+                      asp-action="Delete"
+                      asp-route-id="@Model.Id"
+                      method="post"
+                      style="display:inline">
+                    @Html.AntiForgeryToken()
+                    <button class="btn btn--danger" type="submit">حذف</button>
+                </form>
+            </div>
+        </div>
+    </section>
+</section>
